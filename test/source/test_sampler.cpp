@@ -95,7 +95,7 @@ TEST_CASE("Test file reader (double) with excess lines", "[File Read]"){
     obs.loadData("test/test_data/testing_data1.txt");
     checkFileContents1<double, 3>(obs,in_check, out_check, sig_check);
     std::cerr.rdbuf(originalCerrBuff);
-    std::string expectedOutput = "Unexpected data exceeding three feature x, y and sigma format in line:  9.490792840979749290e-01 9.745396420489874645e-01 1.000000000000000000e+00 7.453083689569964809e-01\n";
+    std::string expectedOutput = "Unexpected data exceeding three feature x, y and sigma format in line 1 :  9.490792840979749290e-01 9.745396420489874645e-01 1.000000000000000000e+00 7.453083689569964809e-01\n";
     CHECK(capturedOutput.str() == expectedOutput);
 }
 

@@ -63,7 +63,7 @@ void Observations<REAL>::loadData(const std::string filename)
         sigmas.push_back(buffer);
         
         if (line_stream >> token){
-            std::cerr << "Unexpected data exceeding three feature x, y and sigma format in line:  " << line << std::endl;
+            std::cerr << "Unexpected data exceeding three feature x, y and sigma format in line " << row_num << " :  " << line << std::endl;
         }
     }
     filestream.close();
