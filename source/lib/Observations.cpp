@@ -6,7 +6,7 @@
 #include <sstream>
 
 template<typename REAL>
-void Observations<REAL>::loadData(std::string filename)
+void Observations<REAL>::loadData(const std::string filename)
 {
     // check extension of file.
     std::string last_four_characters = filename.substr(filename.length() - 4);
@@ -36,20 +36,26 @@ void Observations<REAL>::loadData(std::string filename)
 
         REAL buffer;
         if (!(line_stream >> buffer)){
-            std::cerr << "Error reading input data from line " << row_num << " : " << line << std::endl;
+            std::cerr << "Skipping row - Error reading input data from line " << row_num << " : " << line << std::endl;
             continue;
         } 
         inputs.push_back(buffer);
         
         if (!(line_stream >> buffer)){
-            std::cerr << "Error reading output data from line " << row_num << " : " << line << std::endl;
+            std::cerr << "Skipping row - Error reading output data from line " << row_num << " : " << line << std::endl;
             inputs.pop_back();
             continue;
         }
         outputs.push_back(buffer);
         
         if (!(line_stream >> buffer)){
-            std::cerr << "Error reading sigma data from line " << row_num << " : " << line;
+            std::cerr << "Skipping row - Error reading sigma data from line " << row_num << " : " << line << std::endl;
+            inputs.pop_back();
+            outputs.pop_back();
+            continue;
+        }
+        if (buffer < 0){
+            std::cerr << "Skipping row - Sigma value is negative where standard deviation is inherently positive in line " << row_num << " : " << line << std::endl;
             inputs.pop_back();
             outputs.pop_back();
             continue;
