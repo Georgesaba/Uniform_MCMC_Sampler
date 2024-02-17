@@ -14,6 +14,19 @@ Lines 27 and 28 refer to explicit instantiations of the loadData method template
 
 ## Section 1.2
 
+Why is sample a pure virtual function?
+
+Sample is a pure virtual function because it is a place holder for various sampling methods that would be member functions of classes derived from the base Sampler class. Therefore the sample member function in the base Sampler class needs to be pure virtual as it must be completely overwritten but is necessary for every derived class to have.
+
+What container type have you chosen to use to represent and pass the parameters (~p) to the model /
+likelihood function, and why?
+
+I have used an std::array container to represent and pass the parameters to the model as when a derived class is initialised the number of parameters is known so doesn't need the dynamic size that the std::vector container offers. The std::array takes up less memory so is more ideal in this case. I have used std::map that has a std::array of the sample point acting as a key to the corresponding likelihood value. An array makes sense over a tuple because it is easy to make its size modular and it contains a consistant data type. 
+
+What variables have you made public, private, or protected and why?
+
+The variable that stores the model function, the number of bins and the std::array containing the ParamInfo datatype is private as they can all be accessed using get and set functions and do not need to be directly accessed in the derived class. The std::map linking the param vector to the likelihood, the variable containing the pointer to the observations type variable are both protected as they may need to be accessd by the derived class. The set_param_info, constructor and log_likelihood member classes are all public as they may need to be accessed out of the sampler class.
+
 ## Section 4
 
 ## Section 6

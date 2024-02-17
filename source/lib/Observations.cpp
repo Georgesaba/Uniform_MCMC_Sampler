@@ -4,9 +4,10 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <assert.h>
 
 template<typename REAL>
-void Observations<REAL>::loadData(const std::string filename)
+void Observations<REAL>::loadData(const std::string& filename)
 {
     // check extension of file.
     std::string last_four_characters = filename.substr(filename.length() - 4);
@@ -20,7 +21,7 @@ void Observations<REAL>::loadData(const std::string filename)
     if (!filestream.is_open()) {
         
         std::string error_message = "Unable to open file: " + filename;
-        throw std::invalid_argument(error_message);
+        throw std::runtime_error(error_message);
     }
     std::string line;
     uint row_num = 0;
@@ -67,7 +68,9 @@ void Observations<REAL>::loadData(const std::string filename)
         }
     }
     filestream.close();
+    assert((sigmas.size() == outputs.size()) && (sigmas.size() == inputs.size()));
+    num_points = sigmas.size();
 }
 
-template void Observations<double>::loadData(std::string);
-template void Observations<float>::loadData(std::string);
+template void Observations<double>::loadData(const std::string&);
+template void Observations<float>::loadData(const std::string&);

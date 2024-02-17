@@ -11,9 +11,10 @@ template<typename REAL>
 class Observations
 {
 public:
+    uint num_points;
     std::vector<REAL> inputs;
     std::vector<REAL> outputs;
     std::vector<REAL> sigmas;
 
-    void loadData(std::string filename);
+    void loadData(const std::string& filename);
 };

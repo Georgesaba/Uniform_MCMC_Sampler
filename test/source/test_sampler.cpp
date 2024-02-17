@@ -61,7 +61,7 @@ TEST_CASE("Test file reader (float)", "[File Read]")
 
 TEST_CASE("Test file reader with incorrect path given.","[File Read]"){
     Observations<float> obs;
-    REQUIRE_THROWS_AS(obs.loadData("test/test_data/no_file.txt"),std::invalid_argument);
+    REQUIRE_THROWS_AS(obs.loadData("test/test_data/no_file.txt"),std::runtime_error);
     REQUIRE_THROWS_WITH(obs.loadData("test/test_data/no_file.txt"),"Unable to open file: test/test_data/no_file.txt");
 
 }
