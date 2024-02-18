@@ -10,7 +10,7 @@ It makes sense to store the observation data in std::vector instead of std::arra
 
 2) Explain why lines 27 & 28 are needed in Observations.cpp. How could we avoid this?
 
-Lines 27 and 28 refer to explicit instantiations of the loadData method template for Observations class using the double and float data types. Since it is a member function of a class it needs to be explicitly instantiated for the relevant datatypes it will work with so that the compiler can generate function definitions for the template functions. Without the explicit instantiation, the linker has difficulty finding definitions of the loadData method for specific datatypes causing linking errors as there only is a class template available instead of a template class which is created with the explicit instantiation. To avoid this the full method logic can be placed in the header file where it will be instantiated automatically with the used type.
+Lines 27 and 28, now 75 and 76, refer to explicit instantiations of the loadData method template for Observations class using the double and float data types. Since it is a member function of a class it needs to be explicitly instantiated for the relevant datatypes it will work with so that the compiler can generate function definitions for the template functions. Without the explicit instantiation, the linker has difficulty finding definitions of the loadData method for specific datatypes causing linking errors as there only is a class template available instead of a template class which is created with the explicit instantiation. To avoid this the full method logic can be placed in the header file where it will be instantiated automatically with the used type.
 
 ## Section 1.2
 
@@ -25,7 +25,7 @@ I have used an std::array container to represent and pass the parameters to the 
 
 What variables have you made public, private, or protected and why?
 
-The variable that stores the model function, the number of bins and the std::array containing the ParamInfo datatype is private as they can all be accessed using get and set functions and do not need to be directly accessed in the derived class. The std::map linking the param vector to the likelihood, the variable containing the pointer to the observations type variable are both protected as they may need to be accessd by the derived class. The set_param_info, constructor and log_likelihood member classes are all public as they may need to be accessed out of the sampler class.
+There are no member variables that are public as everything can be accessed from setter and getter member functions. The variable that stores the model function, the number of bins and the std::array containing the ParamInfo datatype is private as they can all be accessed using get and set functions and do not need to be directly accessed in the derived class. The std::map linking the param vector to the likelihood, the variable containing the pointer to the observations type variable and the member function used to calculate the log lieklihood are protected as they may need to be accessd by the derived class. The set_param_info(), constructor(), get_bins(), get_param_info(), set_bins() and get_param_likelihood member classes are all public as they may need to be accessed out of the sampler classes.
 
 ## Section 4
 

@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
 #include "Observations.hpp"
+#include "Sampler.hpp"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -16,17 +17,23 @@ void checkFileContents(const Observations<REAL> &obs)
     REQUIRE(obs.outputs.size() == 3);
     REQUIRE(obs.sigmas.size() == 3);
 
-    REQUIRE_THAT(obs.inputs[0], WithinRel(0.94907, 0.0001));
-    REQUIRE_THAT(obs.inputs[1], WithinRel(0.49062, 0.0001));
-    REQUIRE_THAT(obs.inputs[2], WithinRel(0.98349, 0.0001));
+    REQUIRE_THAT(obs.inputs[0], WithinRel(0.94908, 1e-5));
+    REQUIRE_THAT(obs.inputs[1], WithinRel(0.49062, 1e-5));
+    REQUIRE_THAT(obs.inputs[2], WithinRel(0.98349, 1e-5));
 
-    REQUIRE_THAT(obs.outputs[0], WithinRel(0.97454, 0.0001));
-    REQUIRE_THAT(obs.outputs[1], WithinRel(0.74531, 0.0001));
-    REQUIRE_THAT(obs.outputs[2], WithinRel(0.99174, 0.0001));
+    REQUIRE_THAT(obs.outputs[0], WithinRel(0.97454, 1e-5));
+    REQUIRE_THAT(obs.outputs[1], WithinRel(0.74531, 1e-5));
+    REQUIRE_THAT(obs.outputs[2], WithinRel(0.99174, 1e-5));
 
     for(auto sig : obs.sigmas)
     {
-        REQUIRE_THAT(sig, WithinRel(1.0, 0.0001));
+        REQUIRE_THAT(sig, WithinRel(1.0, 1e-6));
+    }
+}
+
+void print_likelihood_map(std::map<std::array<double, 2>, double> myMap){
+    for (const auto& pair : myMap) {
+        std::cout << "(" << pair.first[0] << ", " << pair.first[1] << "): " << pair.second << std::endl;
     }
 }
 
@@ -37,9 +44,9 @@ void checkFileContents1(const Observations<REAL> &obs,const std::array<REAL, num
     REQUIRE(obs.sigmas.size() == num_rows);
 
     for (std::size_t i = 0; i<num_rows; i++){
-        REQUIRE_THAT(obs.inputs[i], WithinRel(in_check[i],0.001));
-        REQUIRE_THAT(obs.outputs[i], WithinRel(out_check[i],0.001));
-        REQUIRE_THAT(obs.sigmas[i], WithinRel(sig_check[i],0.001));
+        REQUIRE_THAT(obs.inputs[i], WithinRel(in_check[i],1e-6));
+        REQUIRE_THAT(obs.outputs[i], WithinRel(out_check[i],1e-6));
+        REQUIRE_THAT(obs.sigmas[i], WithinRel(sig_check[i],1e-6));
     }
 }
 
@@ -145,5 +152,17 @@ TEST_CASE("Test file reader (double) with negative sigma value in second row", "
     std::string expectedOutput = "Skipping row - Sigma value is negative where standard deviation is inherently positive in line 2 : 4.906167379139929619e-01 7.453083689569964809e-01 -2.000000000000000000e+00\n";
     CHECK(capturedOutput.str() == expectedOutput);
 
+}
+
+TEST_CASE("Test uniform sampling","[Uniform Sampler]"){
+    // instantiate Uniform Sampler with double data type and two parameters.
+    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,2);
+    std::array<std::string, 2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {0,0};
+    std::array<double, 2> max_vals = {1, 1};
+    uniform_sampler.set_param_info(names, min_vals, max_vals);
+    uniform_sampler.sample();
+    std::map<std::array<double, 2>,double> likelihood_map = uniform_sampler.get_param_likelihood();
+    print_likelihood_map(likelihood_map);
 }
 
