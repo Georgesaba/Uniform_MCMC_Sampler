@@ -27,6 +27,29 @@ What variables have you made public, private, or protected and why?
 
 There are no member variables that are public as everything can be accessed from setter and getter member functions. The variable that stores the model function, the number of bins and the std::array containing the ParamInfo datatype is private as they can all be accessed using get and set functions and do not need to be directly accessed in the derived class. The std::map linking the param vector to the likelihood and the variable containing the pointer to the observations type variable are protected as they may need to be accessd by the derived class. The set_param_info(), constructor(), get_bins(), get_param_info(), set_bins() and get_param_likelihood member classes are all public as they may need to be accessed out of the sampler classes. The member function used to calculate the log lieklihood is public as it needs to be accessed out of the class for validation of the likelihood function.
 
+## Section 3.0.1
+
+I tested the Uniform Sampler class on the data/problem_data_2D.txt data using two parameters with ranges between 0 and 5 on the function $y = ax^b$. I then compared the summarised results with the outcome of a python curve_fitting algorithm that used the scipy.optimise library. The output that we are the most interested in is the mean parameter weighted using the marginal distribution. The code I used can be seen below:
+Input ---
+
+import numpy as np
+from scipy.optimize import curve_fit
+
+
+def model_func(x, a, b):
+    return a * x**b
+
+data = np.loadtxt("COMP0210Assignment1/data/problem_data_2D.txt")
+
+inputs = data[:,0]
+outputs = data[:,1]
+
+params, covariance = curve_fit(model_func, inputs, outputs)
+
+print(params) 
+
+Output -- [2.50415752 4.12758947]
+
 ## Section 4
 
 ## Section 6

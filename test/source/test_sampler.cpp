@@ -12,12 +12,12 @@
 using namespace Catch::Matchers;
 
 template <typename REAL>
-REAL param_test_model_func(REAL x, std::array<REAL, 2> params){
+REAL param_test_model_func(REAL x, std::array<REAL, 2> &params){
     return params[0] * x + params[1];
 }
 
 template <typename REAL>
-REAL param_3_test_model_func(REAL x, std::array<REAL, 3> params){
+REAL param_3_test_model_func(REAL x, std::array<REAL, 3> &params){
     return params[0] * x* x + params[1] *x + params[2];
 }
 
@@ -43,7 +43,7 @@ void checkFileContents(const Observations<REAL> &obs)
 }
 
 template<typename REAL, std::size_t num_params>
-void print_likelihood_map(std::map<std::array<REAL, num_params>, REAL> myMap){
+void print_likelihood_map(std::map<std::array<REAL, num_params>, REAL> &myMap){
     for (const auto& pair : myMap) {
         if (num_params == 1){
             std::cout << "(" << pair.first[0] << "): " << pair.second << std::endl;
@@ -98,20 +98,20 @@ TEST_CASE("Test file reader (float)", "[File Read]")
     checkFileContents(obs);
 }
 
-TEST_CASE("Test file reader with incorrect path given.","[File Read]"){
+TEST_CASE("Test file reader with incorrect path given.","[File_Read]"){
     Observations<float> obs;
     REQUIRE_THROWS_AS(obs.loadData("test/test_data/no_file.txt"),std::runtime_error);
     REQUIRE_THROWS_WITH(obs.loadData("test/test_data/no_file.txt"),"Unable to open file: test/test_data/no_file.txt");
 
 }
 
-TEST_CASE("Test file reader (float) on csv", "[File Read]"){
+TEST_CASE("Test file reader (float) on csv", "[File_Read]"){
     Observations<float> obs;
     REQUIRE_THROWS_AS(obs.loadData("test/test_data/testing_data_2D.csv"),std::invalid_argument);
     REQUIRE_THROWS_WITH(obs.loadData("test/test_data/testing_data_2D.csv"),"Incorrect file extension: .csv instead of .txt for file test/test_data/testing_data_2D.csv .");
 }
 
-TEST_CASE("Test file reader (double) when reading ints", "[File Read]"){
+TEST_CASE("Test file reader (double) when reading ints", "[File_Read]"){
     Observations<double> obs;
     obs.loadData("test/test_data/testing_data.txt");
     std::array<double, 4> in = {1.0, 2.0, 9.0, 12.0};
@@ -121,7 +121,7 @@ TEST_CASE("Test file reader (double) when reading ints", "[File Read]"){
     checkFileContents1<double, 4>(obs,in ,out,sig);
 }
 
-TEST_CASE("Test file reader (double) with excess lines", "[File Read]"){
+TEST_CASE("Test file reader (double) with excess lines", "[File_Read]"){
     Observations<double> obs;
     std::array<double, 3> in_check = {9.490792840979749290e-01, 4.906167379139929619e-01, 9.834871049063151904e-01};
     std::array<double, 3> out_check = {9.745396420489874645e-01, 7.453083689569964809e-01, 9.917435524531575952e-01};
@@ -138,7 +138,7 @@ TEST_CASE("Test file reader (double) with excess lines", "[File Read]"){
     CHECK(capturedOutput.str() == expectedOutput);
 }
 
-TEST_CASE("Test file reader (double) with incomplete first, fourth and fith row","[File Read]"){
+TEST_CASE("Test file reader (double) with incomplete first, fourth and fith row","[File_Read]"){
     Observations<double> obs;
 
     std::array<double, 2> in_check = {4.906167379139929619e-01, 9.834871049063151904e-01};
@@ -155,7 +155,7 @@ TEST_CASE("Test file reader (double) with incomplete first, fourth and fith row"
     CHECK(capturedOutput.str() == expectedOutput);
 }
 
-TEST_CASE("Test file reader (double) with letter string entries.", "[File Read]"){    
+TEST_CASE("Test file reader (double) with letter string entries.", "[File_Read]"){    
     Observations<double> obs;
 
     //redirect cerr to different stream
@@ -168,7 +168,7 @@ TEST_CASE("Test file reader (double) with letter string entries.", "[File Read]"
     CHECK(capturedOutput.str() == expectedOutput);
 }
 
-TEST_CASE("Test file reader (double) with negative sigma value in second row", "[File Read]"){
+TEST_CASE("Test file reader (double) with negative sigma value in second row", "[File_Read]"){
     Observations<double> obs;
 
     std::array<double, 3> in_check = {9.490792840979749290e-01, 9.834871049063151904e-01, 9.490792840979749290e-01};
@@ -189,8 +189,8 @@ TEST_CASE("Test file reader (double) with negative sigma value in second row", "
 // TEST_CASE("Test Sampler constructor", "[Sampler]"){
 //     int placeholder;
 // }
-
-TEST_CASE("Preliminary Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform Sampler]"){
+// TODO: Create test cases for constructor, rigidity = true for loadData and chheck for additional aspects of the sampling behaviour we want to check for. Add tests for param ranges of different sizes.
+TEST_CASE("Preliminary Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform_Sampler]"){
     // instantiate Uniform Sampler with double data type and two parameters.
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
@@ -226,7 +226,7 @@ TEST_CASE("Preliminary Test uniform sampling 1 to 2 dimensions with range (0,1)"
     CHECK(capturedOutput2.str() == expected_output2);
 }
 
-TEST_CASE("Test Sample Function for Uniform Sampler from 2 to 3 dimensions", "[Uniform Sampler]"){
+TEST_CASE("Test Sample Function for Uniform Sampler from 2 to 3 dimensions", "[Uniform_Sampler]"){
     //2 dimension param space, 3 bins, 0-1 range
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
@@ -250,7 +250,7 @@ TEST_CASE("Test Sample Function for Uniform Sampler from 2 to 3 dimensions", "[U
     
 }
 
-TEST_CASE("Test likelihood function","[Likelihood Calc]"){
+TEST_CASE("Test likelihood function","[Likelihood_Calc]"){
     test_data test_likelihood;
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
@@ -259,5 +259,22 @@ TEST_CASE("Test likelihood function","[Likelihood Calc]"){
     
     for (uint i = 0; i < test_likelihood.sample_likelihoods.size(); i++){
         CHECK_THAT(std::exp(uniform_sampler.log_likelihood(test_likelihood.sample_points_2d[i])),WithinRel(test_likelihood.sample_likelihoods[i],0.01)); // e is raised to the power of the log-likelihood to get the likelihood.
+    }
+}
+
+TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise]"){
+    //  Made a python file to curve fit the same data to y = ax^b. Testing against parameters found using scipy.optimise.curve_fit
+    std::array<std::string,2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {0, 0};
+    std::array<double, 2> max_vals = {5, 5};
+
+    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals, 100);
+    uniform_sampler.sample();
+    uniform_sampler.summarise();
+    std::array<ParamInfo<double>, 2> params_infos = uniform_sampler.get_params_info();
+    std::vector<double> actual_param = {2.50415752, 4.12758947};
+    for (uint i = 0; i < 2; i++){
+        CHECK_THAT(params_infos[i].mean_parameter,WithinRel(actual_param[i],0.01));
+        CHECK_THAT(params_infos[i].marginal_distribution_peak,WithinAbs(actual_param[i],0.01 * params_infos[i].width));
     }
 }
