@@ -13,6 +13,10 @@ REAL param_2_model_func(REAL x, std::array<REAL, 2> params){
     return params[0] * std::pow(x,params[1]);
 }
 
+template <typename REAL>
+REAL param_1_model_func(REAL x, std::array<REAL, 1> params){
+    return std::pow(x,params[0]);
+}
 
 /**
  * @brief Class for holding / passing information about parameters to be sampled
@@ -52,9 +56,9 @@ template<typename REAL, std::size_t num_params>
 class Sampler
 {
     public:
-    Sampler(const std::string &filepath, const std::function<REAL(REAL,std::array<REAL,num_params>)> &func, uint num_bins = 100) : bins(num_bins) , model_function(func){
-        observations = std::make_unique<Observations<REAL>>();
-        observations->loadData(filepath);
+    Sampler(const std::string &filepath, const std::function<REAL(REAL,std::array<REAL,num_params>)> &func, std::array<std::string,num_params> names, std::array<REAL,num_params> min_values, std::array<REAL, num_params> max_values, uint num_bins = 100,const bool rigidity = false) : bins(num_bins) , model_function(func){
+        observations.loadData(filepath,rigidity);
+        set_param_info(names, min_values, max_values);
     }
     virtual ~Sampler() = default;
     void set_param_info(std::array<std::string,num_params> names, std::array<REAL,num_params> min_values, std::array<REAL, num_params> max_values){
@@ -80,26 +84,22 @@ class Sampler
         return parameter_likelihood;
     }
     
+    REAL log_likelihood(std::array<REAL, num_params> params){
+        REAL sum_likelihood = 0;
+        for (uint i = 0; i < observations.num_points; i++){
+            REAL func_output = model_function(observations.inputs[i],params);
+            sum_likelihood += -(func_output - observations.outputs[i]) * (func_output - observations.outputs[i]) /(2 * observations.sigmas[i] * observations.sigmas[i]);
+        }
+        return sum_likelihood;
+    }
+
     private:
     uint bins;
     std::array<ParamInfo<REAL>, num_params> params_info;
     std::function<REAL(REAL,std::array<REAL,num_params>)> model_function;
     
     protected:
-    REAL log_likelihood(std::array<REAL, num_params> params){
-        REAL sum_likelihood = 0;
-        if (!observations){
-            throw std::runtime_error("The pointer to the observations pointer has not beeen correctly initiated.");
-        }
-        const Observations<REAL>& obs = *observations;
-
-        for (uint i = 0; i < obs.num_points; i++){
-            REAL func_output = model_function(obs.inputs[i],params);
-            sum_likelihood += -(func_output - obs.outputs[i]) * (func_output - obs.outputs[i]) /(2 * obs.sigmas[i] * obs.sigmas[i]);
-        }
-        return sum_likelihood;
-    }
-    std::unique_ptr<Observations<REAL>> observations;
+    Observations<REAL> observations; // std::vector stores data on heap. Observations mainly stores three vectors so can store it on stack.
     std::map<std::array<REAL,num_params>,REAL> parameter_likelihood; //  Dict for parameter vector and liklihood.
     
 };
@@ -121,7 +121,7 @@ class Sampler
 template<typename REAL, std::size_t num_params>
 class UniformSampler : public Sampler<REAL, num_params>{
     public:
-    UniformSampler(const std::string &filepath, const std::function<REAL(REAL,std::array<REAL,num_params>)> &func, uint num_bins = 100) : Sampler<REAL, num_params>(filepath, func, num_bins){}
+    UniformSampler(const std::string &filepath, const std::function<REAL(REAL,std::array<REAL,num_params>)> &func,std::array<std::string,num_params> names, std::array<REAL,num_params> min_values, std::array<REAL, num_params> max_values, uint num_bins = 100) : Sampler<REAL, num_params>(filepath, func,names, min_values, max_values, num_bins){}
     void sample() override {
         const std::array<ParamInfo<REAL>, num_params>& param_info = this -> get_params_info();
         uint num_bins = this -> get_bins();

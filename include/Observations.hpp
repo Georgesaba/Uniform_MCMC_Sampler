@@ -16,5 +16,5 @@ public:
     std::vector<REAL> outputs;
     std::vector<REAL> sigmas;
 
-    void loadData(const std::string& filename);
+    void loadData(const std::string& filename, const bool rigidity = false);
 };

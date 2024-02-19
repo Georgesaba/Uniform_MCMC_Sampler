@@ -7,7 +7,7 @@
 #include <assert.h>
 
 template<typename REAL>
-void Observations<REAL>::loadData(const std::string& filename)
+void Observations<REAL>::loadData(const std::string& filename, const bool rigidity)
 {
     // check extension of file.
     std::string last_four_characters = filename.substr(filename.length() - 4);
@@ -37,33 +37,61 @@ void Observations<REAL>::loadData(const std::string& filename)
 
         REAL buffer;
         if (!(line_stream >> buffer)){
-            std::cerr << "Skipping row - Error reading input data from line " << row_num << " : " << line << std::endl;
-            continue;
+            if (rigidity){
+                filestream.close();
+                throw std::invalid_argument("Error - Invalid data read from line " + std::to_string(row_num) + " : " + line);
+            }
+            else{
+                std::cerr << "Skipping row - Error reading input data from line " << row_num << " : " << line << std::endl;
+                continue;
+            }
         } 
         inputs.push_back(buffer);
         
         if (!(line_stream >> buffer)){
-            std::cerr << "Skipping row - Error reading output data from line " << row_num << " : " << line << std::endl;
-            inputs.pop_back();
-            continue;
+            if (rigidity){
+                filestream.close();
+                throw std::invalid_argument("Error - Invalid data read from line " + std::to_string(row_num) + " : " + line);
+            }
+            else{
+                std::cerr << "Skipping row - Error reading output data from line " << row_num << " : " << line << std::endl;
+                inputs.pop_back();
+                continue;
+            }
         }
         outputs.push_back(buffer);
         
         if (!(line_stream >> buffer)){
-            std::cerr << "Skipping row - Error reading sigma data from line " << row_num << " : " << line << std::endl;
-            inputs.pop_back();
-            outputs.pop_back();
-            continue;
+            if (rigidity) {
+                filestream.close();
+                throw std::invalid_argument("Error - Invalid data read from line " + std::to_string(row_num) + " : " + line);
+            }
+            else{
+                std::cerr << "Skipping row - Error reading sigma data from line " << row_num << " : " << line << std::endl;
+                inputs.pop_back();
+                outputs.pop_back();
+                continue;
+            }
         }
         if (buffer < 0){
-            std::cerr << "Skipping row - Sigma value is negative where standard deviation is inherently positive in line " << row_num << " : " << line << std::endl;
-            inputs.pop_back();
-            outputs.pop_back();
-            continue;
+            if (rigidity){
+                filestream.close();
+                throw std::domain_error("Error - Sigma value possess invalid negative value in line "+ std::to_string(row_num) + " : " + line);
+            }
+            else{
+                std::cerr << "Skipping row - Sigma value is negative where standard deviation is inherently positive in line " << row_num << " : " << line << std::endl;
+                inputs.pop_back();
+                outputs.pop_back();
+                continue;
+            }
         }
         sigmas.push_back(buffer);
         
         if (line_stream >> token){
+            if (rigidity){
+                filestream.close();
+                throw std::domain_error("Error - Unexpected data exceeding three features x, y and sigma format in line " + std::to_string(row_num) + " : " + line);
+            }
             std::cerr << "Unexpected data exceeding three feature x, y and sigma format in line " << row_num << " :  " << line << std::endl;
         }
     }
@@ -72,5 +100,5 @@ void Observations<REAL>::loadData(const std::string& filename)
     num_points = sigmas.size();
 }
 
-template void Observations<double>::loadData(const std::string&);
-template void Observations<float>::loadData(const std::string&);
+template void Observations<double>::loadData(const std::string&, const bool);
+template void Observations<float>::loadData(const std::string&, const bool);

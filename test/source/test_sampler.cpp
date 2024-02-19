@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
+#include "data.h"
 #include "Observations.hpp"
 #include "Sampler.hpp"
 #include <iostream>
@@ -9,6 +10,16 @@
 #include <sstream>
 
 using namespace Catch::Matchers;
+
+template <typename REAL>
+REAL param_test_model_func(REAL x, std::array<REAL, 2> params){
+    return params[0] * x + params[1];
+}
+
+template <typename REAL>
+REAL param_3_test_model_func(REAL x, std::array<REAL, 3> params){
+    return params[0] * x* x + params[1] *x + params[2];
+}
 
 template<typename REAL>
 void checkFileContents(const Observations<REAL> &obs)
@@ -31,9 +42,30 @@ void checkFileContents(const Observations<REAL> &obs)
     }
 }
 
-void print_likelihood_map(std::map<std::array<double, 2>, double> myMap){
+template<typename REAL, std::size_t num_params>
+void print_likelihood_map(std::map<std::array<REAL, num_params>, REAL> myMap){
     for (const auto& pair : myMap) {
-        std::cout << "(" << pair.first[0] << ", " << pair.first[1] << "): " << pair.second << std::endl;
+        if (num_params == 1){
+            std::cout << "(" << pair.first[0] << "): " << pair.second << std::endl;
+        }
+        else{
+            std::cout << "(" << pair.first[0];
+            for (std::size_t i = 1; i < num_params; i++){
+                std::cout << ", " << pair.first[i];
+            }
+            std::cout << "): " << pair.second << std::endl;
+        }
+    }
+}
+
+template<typename REAL, std::size_t num_params>
+void check_sampled_points(std::map<std::array<REAL, num_params>, REAL>& myMap, std::vector<std::array<REAL,num_params>>& validation_points){
+    uint j = 0;
+    for (const auto& pair:myMap){
+        for (std::size_t i = 1; i < num_params; i++){
+            CHECK_THAT(pair.first[i], WithinRel(validation_points[j][i],1e-5));
+        }
+        j +=1;
     }
 }
 
@@ -154,15 +186,78 @@ TEST_CASE("Test file reader (double) with negative sigma value in second row", "
 
 }
 
-TEST_CASE("Test uniform sampling","[Uniform Sampler]"){
+// TEST_CASE("Test Sampler constructor", "[Sampler]"){
+//     int placeholder;
+// }
+
+TEST_CASE("Preliminary Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform Sampler]"){
     // instantiate Uniform Sampler with double data type and two parameters.
-    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,2);
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
     std::array<double, 2> max_vals = {1, 1};
-    uniform_sampler.set_param_info(names, min_vals, max_vals);
+    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,2);
     uniform_sampler.sample();
     std::map<std::array<double, 2>,double> likelihood_map = uniform_sampler.get_param_likelihood();
-    print_likelihood_map(likelihood_map);
+    
+    //capture print
+    auto originalCoutBuff = std::cout.rdbuf();
+    std::ostringstream capturedOutput;
+    std::cout.rdbuf(capturedOutput.rdbuf());
+    print_likelihood_map<double, 2>(likelihood_map);
+    std::cout.rdbuf(originalCoutBuff);
+    std::string expected_output = "(0.25, 0.25): -2767.73\n(0.25, 0.75): -2776.7\n(0.75, 0.25): -2074.02\n(0.75, 0.75): -1586.32\n";
+    CHECK(capturedOutput.str() == expected_output);
+
+    // instantiate Uniform Sampler with double data type and 1 parameter.
+    std::array<std::string, 1> names2 = {"a"};
+    std::array<double, 1> min_vals2 = {0};
+    std::array<double, 1> max_vals2 = {1};
+    UniformSampler<double, 1> uniform_sampler2("data/problem_data_2D.txt",param_1_model_func<double>,names2, min_vals2, max_vals2,5);
+    uniform_sampler2.sample();
+    std::map<std::array<double, 1>,double> likelihood_map2 = uniform_sampler2.get_param_likelihood();
+    
+    //capture print
+    auto originalCoutBuff2 = std::cout.rdbuf();
+    std::ostringstream capturedOutput2;
+    std::cout.rdbuf(capturedOutput2.rdbuf());
+    print_likelihood_map<double, 1>(likelihood_map2);
+    std::cout.rdbuf(originalCoutBuff2);
+    std::string expected_output2 = "(0.1): -3063.44\n(0.3): -2182\n(0.5): -1695.09\n(0.7): -1411.3\n(0.9): -1242.56\n";
+    CHECK(capturedOutput2.str() == expected_output2);
 }
 
+TEST_CASE("Test Sample Function for Uniform Sampler from 2 to 3 dimensions", "[Uniform Sampler]"){
+    //2 dimension param space, 3 bins, 0-1 range
+    std::array<std::string, 2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {0,0};
+    std::array<double, 2> max_vals = {1, 1};
+    UniformSampler<double, 2> uniform_sampler("test/test_data/testing_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,3);
+    uniform_sampler.sample();
+    std::map<std::array<double, 2>,double> likelihood_map = uniform_sampler.get_param_likelihood();
+    std::vector<std::array<double, 2>> validation_points = {{1.0/6.0,1.0/6.0},{1.0/6.0,1.0/2.0},{1.0/6.0,5.0/6.0},{1.0/2.0,1.0/6.0},{1.0/2.0,1.0/2.0},{1.0/2.0,5.0/6.0},{5.0/6.0,1.0/6.0},{5.0/6.0,1.0/2.0},{5.0/6.0,5.0/6.0}};
+    check_sampled_points<double,2>(likelihood_map, validation_points);
+
+    //3 dimension, 2 bins, 0-1 range
+    std::array<std::string, 3> names2 = {"a","b","c"};
+    std::array<double, 3> min_vals2 = {0,0,0};
+    std::array<double, 3> max_vals2 = {1,1,1};
+    UniformSampler<double, 3> uniform_sampler2("test/test_data/testing_data_2D.txt",param_3_test_model_func<double>,names2, min_vals2, max_vals2,2);
+    uniform_sampler2.sample();
+    std::map<std::array<double, 3>,double> likelihood_map2 = uniform_sampler2.get_param_likelihood();
+    std::vector<std::array<double,3>> validation_points2 = {{0.25,0.25,0.25},{0.25,0.25,0.75},{0.25,0.75,0.25},{0.25,0.75,0.75},{0.75,0.25,0.25},{0.75,0.25,0.75},{0.75,0.75,0.25},{0.75,0.75,0.75}};
+    
+    check_sampled_points<double,3>(likelihood_map2,validation_points2);
+    
+}
+
+TEST_CASE("Test likelihood function","[Likelihood Calc]"){
+    test_data test_likelihood;
+    std::array<std::string, 2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {0,0};
+    std::array<double, 2> max_vals = {1, 1};
+    UniformSampler<double, 2> uniform_sampler("test/test_data/testing_data_2D.txt", param_test_model_func<double>, names, min_vals, max_vals, 3);  
+    
+    for (uint i = 0; i < test_likelihood.sample_likelihoods.size(); i++){
+        CHECK_THAT(std::exp(uniform_sampler.log_likelihood(test_likelihood.sample_points_2d[i])),WithinRel(test_likelihood.sample_likelihoods[i],0.01)); // e is raised to the power of the log-likelihood to get the likelihood.
+    }
+}
