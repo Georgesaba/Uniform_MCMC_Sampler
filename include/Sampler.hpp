@@ -9,6 +9,7 @@
 #include <functional>
 #include <numeric>
 #include <ParamInfo.hpp>
+#include "Plot.hpp"
 
 
 /**
@@ -64,9 +65,12 @@ class Sampler
     }
 
     void summarise(bool print = true){
-        for (std::size_t i = 0; i < num_params; i++){;
+        if (!been_sampled){
+            throw std::logic_error("Error - Sample() has not been called.");
+        }
+        for (std::size_t i = 0; i < num_params; i++){
             REAL marginal_peak = 0;
-            REAL param_max;
+            REAL param_max = 0;
             REAL param_mean = 0;
             REAL param_incomplete_sigma = 0; // \sum ((a_i)^2 M_a[i])
 
@@ -77,7 +81,7 @@ class Sampler
             for (uint j = 0; j < bins; j++){
                 REAL param_val = current_params_info.min + (j + 0.5) * current_params_info.width/bins;
 
-                if (current_marginal_distribution[j] > marginal_peak){
+                if (current_marginal_distribution[j]  > marginal_peak){
                     marginal_peak = current_marginal_distribution[j];
                     param_max = param_val;
                 }
@@ -96,6 +100,34 @@ class Sampler
             }
         }
     }
+    
+    void plot_histograms(std::string func_desc = "y=Ax^b", std::string application_name = "Sample2D") const {
+        for (std::size_t i = 0; i < num_params; i++){
+            std::string name = "Param " + params_info[i].name + " Marginal Distribution (" + std::to_string(bins) + " bins) - " + func_desc;
+            std::string filepath = "plots/" + application_name + "/MarginalDistribution/"  + "dist_" + params_info[i].name + "_" + std::to_string(std::lround(params_info[i].min)) + "_" + std::to_string(std::lround(params_info[i].max)) + "_" + std::to_string(bins) + "_" + func_desc + ".png";
+            plot_histogram<REAL>(name, filepath, params_info[i], marginal_distribution[i]);
+        }
+    }
+
+    void plot_best_fit(std::string func_desc = "y=ax^b", std::string application_name = "Sample2D") const {
+        std::string param_ranges;
+        std::string file_param_ranges;
+        std::array<REAL, num_params> fit_params;
+        for (std::size_t i = 0; i < num_params; i++){
+            if (i != 0){
+                param_ranges += ", ";
+                file_param_ranges += "_";
+            }
+            file_param_ranges += params_info[i].name + "_" + std::to_string(std::lround(params_info[i].min)) + "_" + std::to_string(std::lround(params_info[i].max)); 
+            param_ranges += params_info[i].name + "(" + std::to_string(std::lround(params_info[i].min)) + ", " + std::to_string(std::lround(params_info[i].max)) + ")";
+            fit_params[i] = params_info[i].mean_parameter;
+        }
+        
+        std::string name = "Fitted Data with param ranges " + param_ranges + " - " + std::to_string(bins) + " bins";
+        std::string filepath = "plots/"+ application_name + "/CurveFit/fit_" + file_param_ranges + "_" + std::to_string(bins) + "_" + func_desc + ".png";
+
+        plot_fitted_data<REAL, num_params>(name, filepath,func_desc, fit_params, model_function, observations.inputs, observations.outputs);
+    }
 
     private:
     uint bins;
@@ -106,4 +138,5 @@ class Sampler
     Observations<REAL> observations; // std::vector stores data on heap. Observations mainly stores three vectors so can store it on stack.
     std::map<std::array<REAL,num_params>,REAL> parameter_likelihood; //  Dict for parameter vector and liklihood.
     std::vector<std::vector<REAL>> marginal_distribution;
+    bool been_sampled = false;
 };

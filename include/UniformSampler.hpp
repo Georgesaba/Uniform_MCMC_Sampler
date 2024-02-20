@@ -19,19 +19,24 @@ class UniformSampler : public Sampler<REAL, num_params>{
     public:
     UniformSampler(const std::string &filepath, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func,std::array<std::string,num_params> names, std::array<REAL,num_params> min_values, std::array<REAL, num_params> max_values, uint num_bins = 100, const bool rigidity = false) : Sampler<REAL, num_params>(filepath, func,names, min_values, max_values, num_bins, rigidity){}
     void sample() override {
+        if (this -> been_sampled){
+            std::cerr << "Error - Procedure aborted as UniformSampler instance has already sampled the data points." << std::endl;
+        }
+
         const std::array<ParamInfo<REAL>, num_params>& param_info = this -> get_params_info();
         uint num_bins = this -> get_bins();
         std::vector<uint> combination;
         combination_gen(combination, num_params, param_info, num_bins);
         normalise_marginal_distribution();
+        this -> been_sampled = true;
     }
 
     private:
     void normalise_marginal_distribution(){
         for (std::size_t i = 0; i < num_params; i++){
-            REAL sum = std::accumulate(this -> marginal_distribution[i].begin(), this -> marginal_distribution[i].end(),0.0);
+            REAL total_prob = std::accumulate(this -> marginal_distribution[i].begin(), this -> marginal_distribution[i].end(),0.0);//sum of marginal distribution must equal 1
             for (REAL &num: this -> marginal_distribution[i]){
-                num/=sum;
+                num /= total_prob;
             }
         }
     }

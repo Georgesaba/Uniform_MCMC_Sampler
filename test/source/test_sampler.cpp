@@ -264,8 +264,24 @@ TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise]"){
     uniform_sampler.summarise();
     std::array<ParamInfo<double>, 2> params_infos = uniform_sampler.get_params_info();
     std::vector<double> actual_param = {2.50415752, 4.12758947};
+    std::array<double, 2> fitted_params;
     for (uint i = 0; i < 2; i++){
+        fitted_params[i] = params_infos[i].mean_parameter;
         CHECK_THAT(params_infos[i].mean_parameter,WithinRel(actual_param[i],0.01));
         CHECK_THAT(params_infos[i].marginal_distribution_peak,WithinAbs(actual_param[i],0.01 * params_infos[i].width));
     }
+    uniform_sampler.plot_histograms();
+    uniform_sampler.plot_best_fit();
+}
+
+TEST_CASE("test g"){
+    std::array<std::string,2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {2, 3};
+    std::array<double, 2> max_vals = {3, 5};
+
+    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals, 1000);
+    uniform_sampler.sample();
+    uniform_sampler.summarise();
+    uniform_sampler.plot_histograms();
+    uniform_sampler.plot_best_fit();
 }
