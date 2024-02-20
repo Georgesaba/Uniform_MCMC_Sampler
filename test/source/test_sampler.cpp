@@ -2,7 +2,8 @@
 #include <catch2/matchers/catch_matchers_all.hpp>
 #include "data.h"
 #include "Observations.hpp"
-#include "Sampler.hpp"
+#include "ModelFunctions.hpp"
+#include "UniformSampler.hpp"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -10,16 +11,6 @@
 #include <sstream>
 
 using namespace Catch::Matchers;
-
-template <typename REAL>
-REAL param_test_model_func(REAL x, std::array<REAL, 2> &params){
-    return params[0] * x + params[1];
-}
-
-template <typename REAL>
-REAL param_3_test_model_func(REAL x, std::array<REAL, 3> &params){
-    return params[0] * x* x + params[1] *x + params[2];
-}
 
 template<typename REAL>
 void checkFileContents(const Observations<REAL> &obs)
