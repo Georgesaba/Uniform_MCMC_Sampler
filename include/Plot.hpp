@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "ParamInfo.hpp"
 #include "ModelFunctions.hpp"
 #include <iostream>
@@ -16,6 +17,23 @@ std::string formatREALToNDecimalPlaces(REAL value, uint dp = 3) {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(dp) << value;
     return oss.str();
+}
+
+template<typename REAL>
+std::string removeTrailingDecimalPlaces(REAL value, uint max_dp = 3){
+    std::optional<uint> idx;
+    for (uint i = 0; i < max_dp - 1; i++){
+        double rd1 =  std::stod(formatREALToNDecimalPlaces(value,i)); // converting to double for validation purpose
+        double rd2 = std::stod(formatREALToNDecimalPlaces(value,i + 1));
+        if (rd1 == rd2){
+            idx.emplace(i);
+            break;
+        }
+    }
+    if (!(idx)){
+        idx.emplace(max_dp - 1);
+    }
+    return formatREALToNDecimalPlaces(value,idx.value());
 }
 
 template<typename REAL>

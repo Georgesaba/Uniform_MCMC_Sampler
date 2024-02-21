@@ -276,8 +276,8 @@ TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise]"){
 
 TEST_CASE("test g"){
     std::array<std::string,2> names = {"a", "b"};
-    std::array<double, 2> min_vals = {2, 3};
-    std::array<double, 2> max_vals = {3, 5};
+    std::array<double, 2> min_vals = {2.5, 3.5};
+    std::array<double, 2> max_vals = {3.5, 5};
 
     UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals, 1000);
     uniform_sampler.sample();

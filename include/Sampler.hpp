@@ -104,7 +104,9 @@ class Sampler
     void plot_histograms(std::string func_desc = "y=Ax^b", std::string application_name = "Sample2D") const {
         for (std::size_t i = 0; i < num_params; i++){
             std::string name = "Param " + params_info[i].name + " Marginal Distribution (" + std::to_string(bins) + " bins) - " + func_desc;
-            std::string filepath = "plots/" + application_name + "/MarginalDistribution/"  + "dist_" + params_info[i].name + "_" + std::to_string(std::lround(params_info[i].min)) + "_" + std::to_string(std::lround(params_info[i].max)) + "_" + std::to_string(bins) + "_" + func_desc + ".png";
+            std::string minimum_param_val = removeTrailingDecimalPlaces<REAL>(params_info[i].min);
+            std::string maximum_param_val = removeTrailingDecimalPlaces<REAL>(params_info[i].max);
+            std::string filepath = "plots/" + application_name + "/MarginalDistribution/"  + "dist_" + params_info[i].name + "_" + minimum_param_val + "_" + maximum_param_val + "_" + std::to_string(bins) + "_" + func_desc + ".png";
             plot_histogram<REAL>(name, filepath, params_info[i], marginal_distribution[i]);
         }
     }
@@ -118,8 +120,8 @@ class Sampler
                 param_ranges += ", ";
                 file_param_ranges += "_";
             }
-            file_param_ranges += params_info[i].name + "_" + std::to_string(std::lround(params_info[i].min)) + "_" + std::to_string(std::lround(params_info[i].max)); 
-            param_ranges += params_info[i].name + "(" + std::to_string(std::lround(params_info[i].min)) + ", " + std::to_string(std::lround(params_info[i].max)) + ")";
+            file_param_ranges += params_info[i].name + "_" + removeTrailingDecimalPlaces<REAL>(params_info[i].min) + "_" + removeTrailingDecimalPlaces<REAL>(params_info[i].max); 
+            param_ranges += params_info[i].name + "(" + removeTrailingDecimalPlaces<REAL>(params_info[i].min) + ", " + removeTrailingDecimalPlaces<REAL>(params_info[i].max) + ")";
             fit_params[i] = params_info[i].mean_parameter;
         }
         
