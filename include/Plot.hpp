@@ -69,12 +69,10 @@ void plot_histogram(const std::string &name, const std::string &filepath,const P
     
     legend({"Marginal Distribution","Gaussian Fit: μ = " + mu + ", σ  = " + sig});
     save(filepath);
-    //close();
-    //show();
 }
 
 template <typename REAL, std::size_t num_params>
-void plot_fitted_data(std::string name, std::string filepath, std::string func_desc,std::array<REAL, num_params> params, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func,std::vector<REAL> x ,std::vector<REAL> y, uint num_fit_points = 10000){
+void plot_fitted_data(std::string name, std::string filepath, std::string func_desc,std::array<REAL, num_params> params, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func,std::vector<REAL> x ,std::vector<REAL> y, std::vector<REAL> sigma, uint num_fit_points = 10000){
     std::vector<REAL> smooth_x; // input and outputs of highly granular fit with resultant params
     std::vector<REAL> smooth_y;
     auto maxIt = std::max_element(x.begin(),x.end());
@@ -88,14 +86,13 @@ void plot_fitted_data(std::string name, std::string filepath, std::string func_d
         smooth_y.push_back(func(i,params));
     }
     figure();
-    scatter(x, y);
+    errorbar(x, y, sigma,"none");
     hold(on);
     auto p = plot(smooth_x, smooth_y, "r");
     p -> line_width(2);
     title(name);
-    xlabel("Input Data");
-    ylabel("Output Data");
-    legend({"Data","Best Fit - " + func_desc});
+    xlabel("Input");
+    ylabel("Output");
+    legend({"Observations","Best Fit - " + func_desc});
     save(filepath);
-    //close();
 }

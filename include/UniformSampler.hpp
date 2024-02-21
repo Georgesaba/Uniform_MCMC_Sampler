@@ -17,10 +17,17 @@
 template<typename REAL, std::size_t num_params>
 class UniformSampler : public Sampler<REAL, num_params>{
     public:
-    UniformSampler(const std::string &filepath, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func,std::array<std::string,num_params> names, std::array<REAL,num_params> min_values, std::array<REAL, num_params> max_values, uint num_bins = 100, const bool rigidity = false) : Sampler<REAL, num_params>(filepath, func,names, min_values, max_values, num_bins, rigidity){}
+    UniformSampler(const std::string &filepath, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func,std::array<std::string,num_params> names, std::array<REAL,num_params> min_values, std::array<REAL, num_params> max_values, uint num_bins = 100, const bool rigidity = false) : Sampler<REAL, num_params>(filepath, func,names, min_values, max_values, num_bins, rigidity){
+        if (num_bins > 400000000){ // check for negative value inputted causing uint to cycle back to maximum possible value.
+            throw std::domain_error("Error - Abnormally large number of bins selected above 400,000,000. Please use a smaller number of bins.");
+        }
+        if (std::pow(num_bins,num_params) > 10000000){
+            std::cerr << "Warning - Total parameter space exceeds 10,000,000. Uniform Sampling techniques are inefficient at this scale." << std::endl;
+        }
+    }
     void sample() override {
         if (this -> been_sampled){
-            std::cerr << "Error - Procedure aborted as UniformSampler instance has already sampled the data points." << std::endl;
+            std::cerr << "Error - Procedure aborted as this UniformSampler instance has already sampled the data points." << std::endl;
         }
 
         const std::array<ParamInfo<REAL>, num_params>& param_info = this -> get_params_info();

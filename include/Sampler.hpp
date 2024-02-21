@@ -101,7 +101,7 @@ class Sampler
         }
     }
     
-    void plot_histograms(std::string func_desc = "y=Ax^b", std::string application_name = "Sample2D") const {
+    void plot_histograms(std::string func_desc = "y=ax^b", std::string application_name = "Sample2D") const {
         for (std::size_t i = 0; i < num_params; i++){
             std::string name = "Param " + params_info[i].name + " Marginal Distribution (" + std::to_string(bins) + " bins) - " + func_desc;
             std::string minimum_param_val = removeTrailingDecimalPlaces<REAL>(params_info[i].min);
@@ -117,18 +117,18 @@ class Sampler
         std::array<REAL, num_params> fit_params;
         for (std::size_t i = 0; i < num_params; i++){
             if (i != 0){
-                param_ranges += ", ";
+                param_ranges += ",";
                 file_param_ranges += "_";
             }
             file_param_ranges += params_info[i].name + "_" + removeTrailingDecimalPlaces<REAL>(params_info[i].min) + "_" + removeTrailingDecimalPlaces<REAL>(params_info[i].max); 
-            param_ranges += params_info[i].name + "(" + removeTrailingDecimalPlaces<REAL>(params_info[i].min) + ", " + removeTrailingDecimalPlaces<REAL>(params_info[i].max) + ")";
+            param_ranges += params_info[i].name + "(" + removeTrailingDecimalPlaces<REAL>(params_info[i].min) + "," + removeTrailingDecimalPlaces<REAL>(params_info[i].max) + ")";
             fit_params[i] = params_info[i].mean_parameter;
         }
         
-        std::string name = "Fitted Data with param ranges " + param_ranges + " - " + std::to_string(bins) + " bins";
+        std::string name = "Fitted Data with params " + param_ranges + " - " + std::to_string(bins) + " bins";
         std::string filepath = "plots/"+ application_name + "/CurveFit/fit_" + file_param_ranges + "_" + std::to_string(bins) + "_" + func_desc + ".png";
 
-        plot_fitted_data<REAL, num_params>(name, filepath,func_desc, fit_params, model_function, observations.inputs, observations.outputs);
+        plot_fitted_data<REAL, num_params>(name, filepath,func_desc, fit_params, model_function, observations.inputs, observations.outputs, observations.sigmas);
     }
 
     private:

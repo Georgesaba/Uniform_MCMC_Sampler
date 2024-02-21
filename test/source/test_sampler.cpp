@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <filesystem>
 
 using namespace Catch::Matchers;
 
@@ -177,9 +178,14 @@ TEST_CASE("Test file reader (double) with negative sigma value in second row", "
 
 }
 
-// TEST_CASE("Test Sampler constructor", "[Sampler]"){
-//     int placeholder;
-// }
+TEST_CASE("Test Sampler constructor", "[Sampler]"){
+    std::array<std::string, 2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {0.4,1.9};
+    std::array<double, 2> max_vals = {3.0, 9.0};
+    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,2);
+
+
+}
 // TODO: Create test cases for constructor, rigidity = true for loadData and chheck for additional aspects of the sampling behaviour we want to check for. Add tests for param ranges of different sizes.
 TEST_CASE("Preliminary Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform_Sampler]"){
     // instantiate Uniform Sampler with double data type and two parameters.
@@ -253,7 +259,7 @@ TEST_CASE("Test likelihood function","[Likelihood_Calc]"){
     }
 }
 
-TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise]"){
+TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise][Plotting]"){
     //  Made a python file to curve fit the same data to y = ax^b. Testing against parameters found using scipy.optimise.curve_fit
     std::array<std::string,2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0, 0};
@@ -270,18 +276,21 @@ TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise]"){
         CHECK_THAT(params_infos[i].mean_parameter,WithinRel(actual_param[i],0.01));
         CHECK_THAT(params_infos[i].marginal_distribution_peak,WithinAbs(actual_param[i],0.01 * params_infos[i].width));
     }
-    uniform_sampler.plot_histograms();
-    uniform_sampler.plot_best_fit();
+    REQUIRE_NOTHROW(uniform_sampler.plot_histograms());
+    REQUIRE_NOTHROW(uniform_sampler.plot_best_fit());
 }
 
-TEST_CASE("test g"){
+TEST_CASE("TEST PLOTTING","[Plotting][Uniform_Sampler]"){
     std::array<std::string,2> names = {"a", "b"};
-    std::array<double, 2> min_vals = {2.5, 3.5};
-    std::array<double, 2> max_vals = {3.5, 5};
+    std::array<double, 2> min_vals = {1.9, 3.1};
+    std::array<double, 2> max_vals = {3.5, 5.53};
 
     UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals, 1000);
     uniform_sampler.sample();
     uniform_sampler.summarise();
     uniform_sampler.plot_histograms();
     uniform_sampler.plot_best_fit();
+    CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_b_3.1_5.53_1000_y=ax^b.png"));
+    CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_a_1.9_3.5_1000_y=ax^b.png"));
+    CHECK(std::filesystem::exists("plots/Sample2D/CurveFit/fit_a_1.9_3.5_b_3.1_5.53_1000_y=ax^b.png"));
 }

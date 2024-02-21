@@ -19,7 +19,6 @@ void Observations<REAL>::loadData(const std::string& filename, const bool rigidi
     //ifstream means input file stream
     std::ifstream filestream(filename);
     if (!filestream.is_open()) {
-        
         std::string error_message = "Unable to open file: " + filename;
         throw std::runtime_error(error_message);
     }
