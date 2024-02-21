@@ -292,5 +292,5 @@ TEST_CASE("TEST PLOTTING","[Plotting][Uniform_Sampler]"){
     uniform_sampler.plot_best_fit();
     CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_b_3.1_5.53_1000_y=ax^b.png"));
     CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_a_1.9_3.5_1000_y=ax^b.png"));
-    CHECK(std::filesystem::exists("plots/Sample2D/CurveFit/fit_a_1.9_3.5_b_3.1_5.53_1000_y=ax^b.png"));
+    CHECK(std::filesystem::exists("plots/Sample2D/CurveFit/fit_a_1.9_3.5_b_3.1_5.53_1000_y=ax^b.png")); //check files created properly
 }
