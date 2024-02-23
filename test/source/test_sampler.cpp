@@ -1,8 +1,11 @@
+#define CATCH_CONFIG_MAIN 
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
 #include "data.h"
 #include "Observations.hpp"
 #include "ModelFunctions.hpp"
+#include "MetropolisHastingsSampler.hpp"
 #include "UniformSampler.hpp"
 #include <iostream>
 #include <fstream>
@@ -130,6 +133,14 @@ TEST_CASE("Test file reader (double) with excess lines", "[File_Read]"){
     CHECK(capturedOutput.str() == expectedOutput);
 }
 
+TEST_CASE("Test file reader (double) with excess lines - rigidity = true", "[File_Read]"){
+    Observations<double> obs;
+    //redirect cerr to different stream
+    REQUIRE_THROWS_AS(obs.loadData("test/test_data/testing_data1.txt",true),std::domain_error);
+    REQUIRE_THROWS_WITH(obs.loadData("test/test_data/testing_data1.txt",true),"Error - Unexpected data exceeding three features x, y and sigma format in line 1 : 9.490792840979749290e-01 9.745396420489874645e-01 1.000000000000000000e+00 7.453083689569964809e-01");
+}
+
+
 TEST_CASE("Test file reader (double) with incomplete first, fourth and fith row","[File_Read]"){
     Observations<double> obs;
 
@@ -145,6 +156,12 @@ TEST_CASE("Test file reader (double) with incomplete first, fourth and fith row"
     std::cerr.rdbuf(originalCerrBuff);
     std::string expectedOutput = "Skipping row - Error reading sigma data from line 1 : 9.490792840979749290e-01 9.745396420489874645e-01\nSkipping row - Error reading output data from line 4 : 9.834871049063151904e-01\nSkipping row - Error reading output data from line 5 : 9.834871049063151904e-01 N/A\n";
     CHECK(capturedOutput.str() == expectedOutput);
+}
+
+TEST_CASE("Test file reader (double) with incomplete first, fourth and fith row - rigidity = True","[File_Read]"){
+    Observations<double> obs;
+    REQUIRE_THROWS_AS(obs.loadData("test/test_data/testing_data3.txt",true),std::invalid_argument);
+    REQUIRE_THROWS_WITH(obs.loadData("test/test_data/testing_data3.txt",true),"Error - Invalid data read from line 1 : abs dd s");
 }
 
 TEST_CASE("Test file reader (double) with letter string entries.", "[File_Read]"){    
@@ -175,19 +192,33 @@ TEST_CASE("Test file reader (double) with negative sigma value in second row", "
     std::cerr.rdbuf(originalCerrBuff);
     std::string expectedOutput = "Skipping row - Sigma value is negative where standard deviation is inherently positive in line 2 : 4.906167379139929619e-01 7.453083689569964809e-01 -2.000000000000000000e+00\n";
     CHECK(capturedOutput.str() == expectedOutput);
+}
 
+TEST_CASE("Test file reader (double) with negative sigma value in second row - rigidity = True", "[File_Read]"){
+    Observations<double> obs;
+    REQUIRE_THROWS_AS(obs.loadData("test/test_data/testing_data4.txt",true),std::domain_error);
+    REQUIRE_THROWS_WITH(obs.loadData("test/test_data/testing_data4.txt",true),"Error - Sigma value possess invalid negative value in line 2 : 4.906167379139929619e-01 7.453083689569964809e-01 -2.000000000000000000e+00");
 }
 
 TEST_CASE("Test Sampler constructor", "[Sampler]"){
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0.4,1.9};
     std::array<double, 2> max_vals = {3.0, 9.0};
-    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,2);
+    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,100);
+    CHECK(uniform_sampler.get_bins() == 100);
+    CHECK(uniform_sampler.get_params_info()[0].max == max_vals[0]);
+    CHECK(uniform_sampler.get_params_info()[0].min == min_vals[0]);
+    CHECK(uniform_sampler.get_params_info()[0].name == names[0]);
 
+    CHECK(uniform_sampler.get_params_info()[1].max == max_vals[1]);
+    CHECK(uniform_sampler.get_params_info()[1].min == min_vals[1]);
+    CHECK(uniform_sampler.get_params_info()[1].name == names[1]);
 
+    //REQUIRE_THROWS_AS(UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,-1),std::domain_error);
 }
-// TODO: Create test cases for constructor, rigidity = true for loadData and chheck for additional aspects of the sampling behaviour we want to check for. Add tests for param ranges of different sizes.
-TEST_CASE("Preliminary Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform_Sampler]"){
+
+// TODO: Create test cases for constructor, rigidity = true for loadData and check for additional aspects of the sampling behaviour we want to check for. Add tests for param ranges of different sizes.
+TEST_CASE("Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform_Sampler]"){
     // instantiate Uniform Sampler with double data type and two parameters.
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
@@ -293,4 +324,16 @@ TEST_CASE("TEST PLOTTING","[Plotting][Uniform_Sampler]"){
     CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_b_3.1_5.53_1000_y=ax^b.png"));
     CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_a_1.9_3.5_1000_y=ax^b.png"));
     CHECK(std::filesystem::exists("plots/Sample2D/CurveFit/fit_a_1.9_3.5_b_3.1_5.53_1000_y=ax^b.png")); //check files created properly
+}
+
+TEST_CASE("Test MetropolisHastingsSampler","[MHS]"){
+    std::array<std::string,2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {2, 3.5};
+    std::array<double, 2> max_vals = {3, 5};
+
+    MetropolisHastingSampler<double, 2> mh_sampler("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals,1000000,0.01);
+    mh_sampler.sample();
+    mh_sampler.summarise();
+    mh_sampler.plot_histograms("y=ax^b","Sample4D/MHS");
+    mh_sampler.plot_best_fit("y=ax^b", "Sample4D/MHS");
 }

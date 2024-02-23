@@ -34,20 +34,11 @@ class UniformSampler : public Sampler<REAL, num_params>{
         uint num_bins = this -> get_bins();
         std::vector<uint> combination;
         combination_gen(combination, num_params, param_info, num_bins);
-        normalise_marginal_distribution();
+        this -> normalise_marginal_distribution();
         this -> been_sampled = true;
     }
 
     private:
-    void normalise_marginal_distribution(){
-        for (std::size_t i = 0; i < num_params; i++){
-            REAL total_prob = std::accumulate(this -> marginal_distribution[i].begin(), this -> marginal_distribution[i].end(),0.0);//sum of marginal distribution must equal 1
-            for (REAL &num: this -> marginal_distribution[i]){
-                num /= total_prob;
-            }
-        }
-    }
-
     void combination_gen(std::vector<uint>& combination, uint n, const std::array<ParamInfo<REAL>, num_params>& param_info,uint num_bins ){
         if (n == 0){
             std::array<REAL,num_params> parameters; 

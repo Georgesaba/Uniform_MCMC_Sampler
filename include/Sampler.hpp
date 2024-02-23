@@ -137,6 +137,16 @@ class Sampler
     std::function<REAL(REAL,std::array<REAL,num_params>&)> model_function;
     
     protected:
+    void normalise_marginal_distribution(){
+        for (std::size_t i = 0; i < num_params; i++){
+            REAL total_prob = std::accumulate(this -> marginal_distribution[i].begin(), this -> marginal_distribution[i].end(),0.0);//sum of marginal distribution must equal 1
+            for (REAL &num: this -> marginal_distribution[i]){
+                num /= total_prob;
+            }
+        }
+    }
+
+
     Observations<REAL> observations; // std::vector stores data on heap. Observations mainly stores three vectors so can store it on stack.
     std::map<std::array<REAL,num_params>,REAL> parameter_likelihood; //  Dict for parameter vector and liklihood.
     std::vector<std::vector<REAL>> marginal_distribution;
