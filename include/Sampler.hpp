@@ -10,6 +10,7 @@
 #include <numeric>
 #include <ParamInfo.hpp>
 #include "Plot.hpp"
+#include <optional>
 
 
 /**
@@ -106,12 +107,19 @@ class Sampler
             std::string name = "Param " + params_info[i].name + " Marginal Distribution (" + std::to_string(bins) + " bins) - " + func_desc;
             std::string minimum_param_val = removeTrailingDecimalPlaces<REAL>(params_info[i].min);
             std::string maximum_param_val = removeTrailingDecimalPlaces<REAL>(params_info[i].max);
-            std::string filepath = "plots/" + application_name + "/MarginalDistribution/"  + "dist_" + params_info[i].name + "_" + minimum_param_val + "_" + maximum_param_val + "_" + std::to_string(bins) + "_" + func_desc + ".png";
+            std::string label_extension = "_";
+            if (extra_settings){
+                for (const auto& pair:extra_settings.value()){
+                    label_extension += pair.first + "_" + pair.second + "_";
+                }
+            }
+            std::string filepath = "plots/" + application_name + "/MarginalDistribution/"  + "dist_" + params_info[i].name + label_extension + minimum_param_val + "_" + maximum_param_val + "_" + std::to_string(bins) + "_" + func_desc + ".png";
             plot_histogram<REAL>(name, filepath, params_info[i], marginal_distribution[i]);
         }
     }
 
     void plot_best_fit(std::string func_desc = "y=ax^b", std::string application_name = "Sample2D") const {
+        std::string label_extension = "_";
         std::string param_ranges;
         std::string file_param_ranges;
         std::array<REAL, num_params> fit_params;
@@ -124,9 +132,14 @@ class Sampler
             param_ranges += params_info[i].name + "(" + removeTrailingDecimalPlaces<REAL>(params_info[i].min) + "," + removeTrailingDecimalPlaces<REAL>(params_info[i].max) + ")";
             fit_params[i] = params_info[i].mean_parameter;
         }
-        
+        if (extra_settings){
+            for (const auto& pair:extra_settings.value()){
+                label_extension += pair.first + "_" + pair.second + "_";
+            }
+        }
+
         std::string name = "Fitted Data with params " + param_ranges + " - " + std::to_string(bins) + " bins";
-        std::string filepath = "plots/"+ application_name + "/CurveFit/fit_" + file_param_ranges + "_" + std::to_string(bins) + "_" + func_desc + ".png";
+        std::string filepath = "plots/"+ application_name + "/CurveFit/fit_" + file_param_ranges + "_" + std::to_string(bins) + label_extension + func_desc + ".png";
 
         plot_fitted_data<REAL, num_params>(name, filepath,func_desc, fit_params, model_function, observations.inputs, observations.outputs, observations.sigmas);
     }
@@ -135,6 +148,7 @@ class Sampler
     uint bins;
     std::array<ParamInfo<REAL>, num_params> params_info;
     std::function<REAL(REAL,std::array<REAL,num_params>&)> model_function;
+    std::optional<std::map<std::string,std::string>> extra_settings;
     
     protected:
     void normalise_marginal_distribution(){
@@ -144,6 +158,11 @@ class Sampler
                 num /= total_prob;
             }
         }
+    }
+    
+    // for derived classes that have extra conditions so they can be included in plots.
+    void set_extra_settings(std::map<std::string,std::string> settings){
+        extra_settings = settings;
     }
 
 

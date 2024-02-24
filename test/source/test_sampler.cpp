@@ -327,13 +327,13 @@ TEST_CASE("TEST PLOTTING","[Plotting][Uniform_Sampler]"){
 }
 
 TEST_CASE("Test MetropolisHastingsSampler","[MHS]"){
-    std::array<std::string,2> names = {"a", "b"};
-    std::array<double, 2> min_vals = {2, 3.5};
-    std::array<double, 2> max_vals = {3, 5};
+    std::array<std::string,4> names = {"a", "b", "c", "d"};
+    std::array<double, 4> min_vals = {-3, -3, -3, -3};
+    std::array<double, 4> max_vals = {3, 3, 3, 3};
 
-    MetropolisHastingSampler<double, 2> mh_sampler("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals,1000000,0.01);
+    MetropolisHastingSampler<double, 4> mh_sampler("data/problem_data_4D.txt", polynomial<double>, names, min_vals, max_vals,200000,0.01);
     mh_sampler.sample();
     mh_sampler.summarise();
-    mh_sampler.plot_histograms("y=ax^b","Sample4D/MHS");
-    mh_sampler.plot_best_fit("y=ax^b", "Sample4D/MHS");
+    mh_sampler.plot_histograms("cubic","Sample4D/MHS");
+    mh_sampler.plot_best_fit("cubic", "Sample4D/MHS");
 }

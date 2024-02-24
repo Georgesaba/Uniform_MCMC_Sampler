@@ -27,16 +27,16 @@ std::array<double,2> split(std::string ranges){
     std::string lower = "";
     for (uint i = 0; i < ranges.size(); i++){
         if (i < idx_comma){
-            upper += ranges[i];
+            lower += ranges[i];
         }
         else if (i > idx_comma){
-            lower += ranges[i];
+            upper += ranges[i];
         }
         else{
             continue;
         }
     }
-    return {std::stod(upper), std::stod(lower)};
+    return {std::stod(lower), std::stod(upper)};
 }
 
 
@@ -47,6 +47,11 @@ int main(int argc, char** argv)
     bool rigidity = false;
     bool filepath_set = false;
     bool num_bins_set = false;
+    bool a_range_set = false;
+    bool b_range_set = false;
+    bool rigidity_set = false;
+    std::array<double,2> a_range;
+    std::array<double, 2> b_range;
 
     // std::cout << std::string(argv[0]) << "," << std::string(argv[1]) << std::endl;
     // std::cout << argc << std::endl;
@@ -57,29 +62,60 @@ int main(int argc, char** argv)
             HelpMessage();
             return 0;
         }
-        else if (arg == "-f"){
+        else if (arg == "-f") {
+            if (filepath_set){
+                std::cerr << "Error - Cannot set filepath twice!" << std::endl;
+                return 1;
+            }
             std::string arg1(argv[i+1]);
             filepath = arg1;
             filepath_set = true;
         }
         else if (arg == "-n"){
+            if (num_bins_set){
+                std::cerr << "Error - Cannot set the number of bins twice!" << std::endl;
+                return 1;
+            }
             std::string arg1(argv[i+1]);
             num_bins = std::atoi(arg1.c_str());
             num_bins_set = true;
         }
         else if (arg == "-g"){
+            if (rigidity_set){
+                std::cerr << "Error - Cannot set the rigidity twice!" << std::endl;
+                return 1;
+            }
             std::string arg1(argv[i+1]);
             if ((arg1 == "True") || (arg1 == "true")){
                 rigidity = true;
+                rigidity_set = true;
+            }
+            else if((arg1 == "False") || (arg1 == "false")){
+                rigidity = false;
+                rigidity_set = true;
+            }
+            else{
+                std::cerr << "Error - please input valid rigidity setting!" << std::endl;
+                return 1;
             }
         }
         else if (arg == "-ar"){
+            if (a_range_set){
+                std::cerr << "Error - the range of parameter a has already been set!" << std::endl;
+                return 1;
+            }
             std::string arg1(argv[i+1]);
-            std::array<double,2> a_range = split(arg1.c_str());
+            a_range = split(arg1.c_str());
+            a_range_set = true;
         }
         else if (arg == "-br"){
+            if (b_range_set){
+                std::cerr << "Error - the range of parameter b has already been set!" << std::endl;
+                return 1;
+            }
             std::string arg1(argv[i+1]);
-            std::array<double,2> b_range = split(arg1.c_str());
+            b_range = split(arg1.c_str());
+            b_range_set = true;
         }
         else{
             std::cerr << "Invalid Flag Detected: " << arg << std::endl;
@@ -88,6 +124,7 @@ int main(int argc, char** argv)
     }
     if (!(num_bins_set && filepath_set)){
         std::cerr << "Please enter the number of bins and the filepath!" << std::endl;
+        return 1;
     }
 
     if (filepath.empty() || num_bins <= 0){
@@ -97,8 +134,25 @@ int main(int argc, char** argv)
     }
 
     std::array<std::string,2> names = {"a", "b"};
-    std::array<double, 2> min_vals = {0, 0};
-    std::array<double, 2> max_vals = {5, 5};
+    std::array<double, 2> min_vals;
+    std::array<double, 2> max_vals;
+    if (a_range_set){
+        max_vals[0] = a_range[1];
+        min_vals[0] = a_range[0];
+    }
+    else{
+        max_vals[0] = 5;
+        min_vals[0] = 0;
+    }
+    if (b_range_set){
+        max_vals[1] = b_range[1];
+        min_vals[1] = b_range[0];
+    }
+    else{
+        max_vals[1] = 5;
+        min_vals[1] = 0;
+    }
+
     std::unique_ptr<UniformSampler<double, 2>> uniform_sampler_ptr;
 
     try{

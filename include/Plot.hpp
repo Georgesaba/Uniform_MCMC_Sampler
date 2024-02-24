@@ -9,6 +9,7 @@
 #include <functional>
 #include <sstream>
 #include <iomanip>
+#include <optional>
 
 using namespace matplot;
 
@@ -37,6 +38,26 @@ std::string removeTrailingDecimalPlaces(REAL value, uint max_dp = 3){
 }
 
 template<typename REAL>
+std::string findsigfig(REAL number){
+    uint idx = 0;
+    std::string result = "";
+    std::string num_as_string = std::to_string(number);
+    for (uint i = num_as_string.size() - 1; i > 0; i--){
+        if (num_as_string[i] != '0'){
+            idx = i;
+            break;
+        }
+    }
+    for (uint i = 0; i < num_as_string.size(); i++){
+        result += num_as_string[i];
+        if (i == idx){
+            break;
+        }
+    }
+    return result;
+}
+
+template<typename REAL>
 void plot_histogram(const std::string &name, const std::string &filepath,const ParamInfo<REAL>& param_info, const std::vector<REAL> &marginal_distribution, uint num_fit_points = 10000){
     uint num_bins = marginal_distribution.size();
     std::vector<REAL> bin_midpoints;
@@ -48,7 +69,6 @@ void plot_histogram(const std::string &name, const std::string &filepath,const P
     std::vector<REAL> smooth_x;
     std::vector<REAL> smooth_y;
     REAL param_step = param_info.width/num_fit_points;
-    
     
     for (REAL i = param_info.min; i <= param_info.max; i+=param_step){
         smooth_x.push_back(i);
@@ -62,6 +82,14 @@ void plot_histogram(const std::string &name, const std::string &filepath,const P
     auto p = plot(smooth_x, smooth_y, "r");
     p->line_width(2);
     title(name);
+    // if (extra_settings){
+    //     std::string plot_text = "";
+    //     for (const auto& pair:extra_settings.value()){
+    //         plot_text += pair.first + " = " + pair.second + "; ";
+    //     }
+    //     text(1, 1, plot_text);
+    // }
+
     xlabel("Parameter Value");
     ylabel("Marginal Distribution");
     std::string mu = formatREALToNDecimalPlaces<REAL>(param_info.mean_parameter,3);
@@ -90,6 +118,13 @@ void plot_fitted_data(std::string name, std::string filepath, std::string func_d
     hold(on);
     auto p = plot(smooth_x, smooth_y, "r");
     p -> line_width(2);
+    // if (extra_settings){
+    //     std::string plot_text = "";
+    //     for (const auto& pair:extra_settings.value()){
+    //         plot_text += pair.first + " = " + pair.second + "; ";
+    //     }
+    //     text(0, 1.5, plot_text);
+    // }
     title(name);
     xlabel("Input");
     ylabel("Output");

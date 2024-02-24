@@ -91,6 +91,7 @@ class MetropolisHastingSampler : public Sampler<REAL, num_params>{
         }
         this -> normalise_marginal_distribution();
         this -> been_sampled = true;
+        this -> set_extra_settings({{"step-size",findsigfig<REAL>(step_size)},{"sample-points",std::to_string(num_sample_points)}});
     }
 
     private:
