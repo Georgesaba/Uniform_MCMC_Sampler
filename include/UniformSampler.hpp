@@ -46,10 +46,8 @@ class UniformSampler : public Sampler<REAL, num_params>{
                 parameters[idx] = param_info[idx].min + (combination[idx] + 0.5) * param_info[idx].width/num_bins;
             }
             REAL lg_likelihood = this ->log_likelihood(parameters);
-            //std::cout << lg_likelihood << std::endl;
             this -> parameter_likelihood[parameters] = lg_likelihood;
             REAL likelihood = std::exp(lg_likelihood);
-            //std::cout << likelihood << std::endl; /// debugging
             for (std::size_t j = 0; j < num_params; j++){
                 this -> marginal_distribution[j][combination[j]] += likelihood;
             }

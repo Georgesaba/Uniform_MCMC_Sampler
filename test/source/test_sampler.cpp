@@ -286,7 +286,7 @@ TEST_CASE("Test likelihood function","[Likelihood_Calc]"){
     UniformSampler<double, 2> uniform_sampler("test/test_data/testing_data_2D.txt", param_test_model_func<double>, names, min_vals, max_vals, 3);  
     
     for (uint i = 0; i < test_likelihood.sample_likelihoods.size(); i++){
-        CHECK_THAT(std::exp(uniform_sampler.log_likelihood(test_likelihood.sample_points_2d[i])),WithinRel(test_likelihood.sample_likelihoods[i],0.01)); // e is raised to the power of the log-likelihood to get the likelihood.
+        CHECK_THAT(std::exp(uniform_sampler.log_likelihood(test_likelihood.sample_points_2d[i])),WithinRel(test_likelihood.sample_likelihoods[i],0.000001)); // e is raised to the power of the log-likelihood to get the likelihood.
     }
 }
 
@@ -326,12 +326,14 @@ TEST_CASE("TEST PLOTTING","[Plotting][Uniform_Sampler]"){
     CHECK(std::filesystem::exists("plots/Sample2D/CurveFit/fit_a_1.9_3.5_b_3.1_5.53_1000_y=ax^b.png")); //check files created properly
 }
 
+
 TEST_CASE("Test MetropolisHastingsSampler","[MHS]"){
     std::array<std::string,4> names = {"a", "b", "c", "d"};
-    std::array<double, 4> min_vals = {-3, -3, -3, -3};
+    std::array<double, 4> min_vals = {-3, -3, -3,-3};
     std::array<double, 4> max_vals = {3, 3, 3, 3};
 
-    MetropolisHastingSampler<double, 4> mh_sampler("data/problem_data_4D.txt", polynomial<double>, names, min_vals, max_vals,200000,0.01);
+    MetropolisHastingSampler<double, 4> mh_sampler("data/problem_data_4D.txt", polynomial<double>, names, min_vals, max_vals,1000000,0.01);
+
     mh_sampler.sample();
     mh_sampler.summarise();
     mh_sampler.plot_histograms("cubic","Sample4D/MHS");

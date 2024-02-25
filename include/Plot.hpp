@@ -4,6 +4,8 @@
 #include "ModelFunctions.hpp"
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <iterator>
 #include <string>
 #include <matplot/matplot.h>
 #include <functional>
@@ -74,7 +76,7 @@ void plot_histogram(const std::string &name, const std::string &filepath,const P
         smooth_x.push_back(i);
         smooth_y.push_back(gaussian_func<REAL>(i,param_info.standard_deviation, param_info.mean_parameter));
     }
-    //figure_size(1000, 600); 
+    
     figure();
     auto b = bar(bin_midpoints, marginal_probability_density);
     hold(on);
@@ -82,13 +84,6 @@ void plot_histogram(const std::string &name, const std::string &filepath,const P
     auto p = plot(smooth_x, smooth_y, "r");
     p->line_width(2);
     title(name);
-    // if (extra_settings){
-    //     std::string plot_text = "";
-    //     for (const auto& pair:extra_settings.value()){
-    //         plot_text += pair.first + " = " + pair.second + "; ";
-    //     }
-    //     text(1, 1, plot_text);
-    // }
 
     xlabel("Parameter Value");
     ylabel("Marginal Distribution");
@@ -100,7 +95,7 @@ void plot_histogram(const std::string &name, const std::string &filepath,const P
 }
 
 template <typename REAL, std::size_t num_params>
-void plot_fitted_data(std::string name, std::string filepath, std::string func_desc,std::array<REAL, num_params> params, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func,std::vector<REAL> x ,std::vector<REAL> y, std::vector<REAL> sigma, uint num_fit_points = 10000){
+void plot_fitted_data(const std::string &name, const std::string &filepath,const std::string &func_desc,std::array<REAL, num_params> &params, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func, const std::vector<REAL> &x ,const std::vector<REAL> &y,const std::vector<REAL> &sigma, uint num_fit_points = 10000){
     std::vector<REAL> smooth_x; // input and outputs of highly granular fit with resultant params
     std::vector<REAL> smooth_y;
     auto maxIt = std::max_element(x.begin(),x.end());
@@ -118,14 +113,10 @@ void plot_fitted_data(std::string name, std::string filepath, std::string func_d
     hold(on);
     auto p = plot(smooth_x, smooth_y, "r");
     p -> line_width(2);
-    // if (extra_settings){
-    //     std::string plot_text = "";
-    //     for (const auto& pair:extra_settings.value()){
-    //         plot_text += pair.first + " = " + pair.second + "; ";
-    //     }
-    //     text(0, 1.5, plot_text);
-    // }
     title(name);
+    if (func_desc == "cubic"){
+        gca()->title_font_size_multiplier(0.8);
+    }
     xlabel("Input");
     ylabel("Output");
     legend({"Observations","Best Fit - " + func_desc});

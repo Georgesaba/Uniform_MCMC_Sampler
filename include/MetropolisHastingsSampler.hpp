@@ -1,6 +1,7 @@
 #pragma once
 #include "Sampler.hpp"
 #include <random>
+#include <cassert>
 
 /**
  * @brief
@@ -37,20 +38,24 @@ class MetropolisHastingSampler : public Sampler<REAL, num_params>{
         uint number_bins = this -> get_bins();
         std::uniform_real_distribution<REAL> initial_dist(0,1);
         std::normal_distribution<REAL> step_dist(0,step_size);
-        REAL bin_width;
+        
         uint bin_number;
         REAL lg_likelihood;
+
         for (std::size_t i = 0; i < num_params; i++){
             unit_hypercube[i] = initial_dist(generator);
             params[i] = params_info[i].min + unit_hypercube[i] * params_info[i].width;
-            bin_width = params_info[i].width/number_bins;
-            bin_number = static_cast<uint>(std::floor(params[i]/bin_width));
+                      
+            bin_number = static_cast<uint>(std::floor(unit_hypercube[i] * number_bins));
+            
             this -> marginal_distribution[i][bin_number]++;
         }
+        
         this -> parameter_likelihood[params] = this -> log_likelihood(params);
+        
         for (uint j = 0; j < num_sample_points; j++){
             for (std::size_t i = 0; i < num_params; i++){
-                new_unit_hypercube[i] = unit_hypercube[0] + step_dist(generator);
+                new_unit_hypercube[i] = unit_hypercube[i] + step_dist(generator);
                 if (new_unit_hypercube[i] > 1){
                     new_unit_hypercube[i]--;
                 }
@@ -66,32 +71,31 @@ class MetropolisHastingSampler : public Sampler<REAL, num_params>{
                 params = new_params;
                 unit_hypercube = new_unit_hypercube;
                 this -> parameter_likelihood[new_params] = lg_likelihood;
+                
             }
             else{
-                //std::cout << (lg_likelihood - this -> parameter_likelihood[params]) << " : " << std::log(initial_dist(generator)) << std::endl;
+                
                 if ((lg_likelihood - this -> parameter_likelihood[params]) > std::log(initial_dist(generator))){
                     params = new_params;
                     unit_hypercube = new_unit_hypercube;
                     this -> parameter_likelihood[new_params] = lg_likelihood;
+                    
                 }
                 else{
                     new_params = params;
                     new_unit_hypercube = unit_hypercube;
                 }
             }
-
-            //std::cout << "(";
+            assert(new_params == params);
+            assert(new_unit_hypercube == unit_hypercube);
             for (std::size_t i = 0; i < num_params; i++){
-                bin_width = params_info[i].width/number_bins;
-                bin_number = static_cast<uint>(std::floor((params[i] - params_info[i].min)/bin_width));
+                bin_number = static_cast<uint>(std::floor(unit_hypercube[i] * number_bins));
                 this -> marginal_distribution[i][bin_number]++;
-                //std::cout << params[i] << ", ";
             }
-            //std::cout << rank << ")" << std::endl;
         }
         this -> normalise_marginal_distribution();
         this -> been_sampled = true;
-        this -> set_extra_settings({{"step-size",findsigfig<REAL>(step_size)},{"sample-points",std::to_string(num_sample_points)}});
+        this -> set_extra_settings({{"σ_step",findsigfig<REAL>(step_size)},{"N_sample",std::to_string(num_sample_points)}});
     }
 
     private:

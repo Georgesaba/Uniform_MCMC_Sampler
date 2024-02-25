@@ -154,7 +154,7 @@ class Sampler
     void normalise_marginal_distribution(){
         for (std::size_t i = 0; i < num_params; i++){
             REAL total_prob = std::accumulate(this -> marginal_distribution[i].begin(), this -> marginal_distribution[i].end(),0.0);//sum of marginal distribution must equal 1
-            for (REAL &num: this -> marginal_distribution[i]){
+            for (REAL &num: marginal_distribution[i]){
                 num /= total_prob;
             }
         }
