@@ -147,8 +147,8 @@ class Sampler
     private:
     uint bins;
     std::array<ParamInfo<REAL>, num_params> params_info;
-    std::function<REAL(REAL,std::array<REAL,num_params>&)> model_function;
-    std::optional<std::map<std::string,std::string>> extra_settings;
+    std::function<REAL(REAL,std::array<REAL, num_params>&)> model_function;
+    std::optional<std::map<std::string, std::string>> extra_settings;
     
     protected:
     void normalise_marginal_distribution(){
@@ -167,7 +167,7 @@ class Sampler
 
 
     Observations<REAL> observations; // std::vector stores data on heap. Observations mainly stores three vectors so can store it on stack.
-    std::map<std::array<REAL,num_params>,REAL> parameter_likelihood; //  Dict for parameter vector and liklihood.
+    std::map<std::array<REAL, num_params>,REAL> parameter_likelihood; //  Dict for parameter vector and liklihood.
     std::vector<std::vector<REAL>> marginal_distribution;
     bool been_sampled = false;
 };

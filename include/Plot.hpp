@@ -76,7 +76,7 @@ void plot_histogram(const std::string &name, const std::string &filepath,const P
         smooth_x.push_back(i);
         smooth_y.push_back(gaussian_func<REAL>(i,param_info.standard_deviation, param_info.mean_parameter));
     }
-    
+
     figure();
     auto b = bar(bin_midpoints, marginal_probability_density);
     hold(on);
@@ -98,8 +98,8 @@ template <typename REAL, std::size_t num_params>
 void plot_fitted_data(const std::string &name, const std::string &filepath,const std::string &func_desc,std::array<REAL, num_params> &params, const std::function<REAL(REAL,std::array<REAL,num_params>&)> &func, const std::vector<REAL> &x ,const std::vector<REAL> &y,const std::vector<REAL> &sigma, uint num_fit_points = 10000){
     std::vector<REAL> smooth_x; // input and outputs of highly granular fit with resultant params
     std::vector<REAL> smooth_y;
-    auto maxIt = std::max_element(x.begin(),x.end());
-    auto minIt = std::min_element(x.begin(),x.end());
+    auto maxIt = std::max_element(x.begin(), x.end());
+    auto minIt = std::min_element(x.begin(), x.end());
     REAL max_x = *maxIt;
     REAL min_x = *minIt;
     REAL x_step = (max_x - min_x)/num_fit_points;
@@ -109,7 +109,7 @@ void plot_fitted_data(const std::string &name, const std::string &filepath,const
         smooth_y.push_back(func(i,params));
     }
     figure();
-    errorbar(x, y, sigma,"none");
+    errorbar(x, y, sigma, "none");
     hold(on);
     auto p = plot(smooth_x, smooth_y, "r");
     p -> line_width(2);

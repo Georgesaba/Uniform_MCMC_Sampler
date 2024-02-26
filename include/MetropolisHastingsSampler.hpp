@@ -36,8 +36,8 @@ class MetropolisHastingSampler : public Sampler<REAL, num_params>{
         std::array<REAL, num_params> params;
         std::array<REAL, num_params> new_params;
         uint number_bins = this -> get_bins();
-        std::uniform_real_distribution<REAL> initial_dist(0,1);
-        std::normal_distribution<REAL> step_dist(0,step_size);
+        std::uniform_real_distribution<REAL> initial_dist(0, 1);
+        std::normal_distribution<REAL> step_dist(0, step_size);
         
         uint bin_number;
         REAL lg_likelihood;
@@ -95,7 +95,7 @@ class MetropolisHastingSampler : public Sampler<REAL, num_params>{
         }
         this -> normalise_marginal_distribution();
         this -> been_sampled = true;
-        this -> set_extra_settings({{"σ_step",findsigfig<REAL>(step_size)},{"N_sample",std::to_string(num_sample_points)}});
+        this -> set_extra_settings({{"step_size", findsigfig<REAL>(step_size)},{"N_sample",std::to_string(num_sample_points)}});
     }
 
     private:

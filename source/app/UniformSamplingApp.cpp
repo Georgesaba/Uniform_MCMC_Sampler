@@ -5,7 +5,7 @@
 #include <memory>
 
 void HelpMessage(){
-    std::cout << "This program uses uniform sampling to fit data to the equation y = ax^b with default parameter ranges from 0 to 5. \nThe data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ)\n\nBrief Instructions can be found below." << std::endl;
+    std::cout << "This program uses uniform sampling to fit data to the equation y = ax^b with default parameter ranges from 0 to 5. \nThe data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ).\n\nBrief instructions can be found below." << std::endl;
     std::cout << "Usage: Sample2D -f <file_path> -n <number_of_bins>\n"
               << "Options:\n"
               << "  -h                Show this help message\n"
@@ -113,7 +113,16 @@ int main(int argc, char** argv)
                 return 1;
             }
             std::string arg1(argv[i+1]);
+            try{
+                split(arg1.c_str());   // test operation for parameter a. Since try is separate scope to avoid usage of pointers to heap operation is being run twice.
+            }
+            catch(const std::invalid_argument&){
+                std::cerr << "Error - the range of parameter a has had incorrect inputs!" << std::endl;
+                HelpMessage();
+                return 1;
+            }
             a_range = split(arg1.c_str());
+            
             a_range_set = true;
         }
         else if (arg == "-br"){
@@ -123,6 +132,14 @@ int main(int argc, char** argv)
                 return 1;
             }
             std::string arg1(argv[i+1]);
+            try{
+                split(arg1.c_str());
+            }
+            catch(const std::invalid_argument&){
+                std::cerr << "Error - the range of parameter b has had incorrect inputs!" << std::endl;
+                HelpMessage();
+                return 1;
+            }
             b_range = split(arg1.c_str());
             b_range_set = true;
         }

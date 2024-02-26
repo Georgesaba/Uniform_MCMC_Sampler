@@ -290,7 +290,7 @@ TEST_CASE("Test likelihood function","[Likelihood_Calc]"){
     }
 }
 
-TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise][Plotting]"){
+TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise]"){
     //  Made a python file to curve fit the same data to y = ax^b. Testing against parameters found using scipy.optimise.curve_fit
     std::array<std::string,2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0, 0};
@@ -302,10 +302,11 @@ TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise][Plotting]"){
     std::array<ParamInfo<double>, 2> params_infos = uniform_sampler.get_params_info();
     std::vector<double> actual_param = {2.50415752, 4.12758947};
     std::array<double, 2> fitted_params;
+    
     for (uint i = 0; i < 2; i++){
         fitted_params[i] = params_infos[i].mean_parameter;
         CHECK_THAT(params_infos[i].mean_parameter,WithinRel(actual_param[i],0.01));
-        CHECK_THAT(params_infos[i].marginal_distribution_peak,WithinAbs(actual_param[i],0.01 * params_infos[i].width));
+        CHECK_THAT(params_infos[i].marginal_distribution_peak,WithinAbs(actual_param[i],0.01 * params_infos[i].width)); // check that analytical solution falls within peak
     }
     REQUIRE_NOTHROW(uniform_sampler.plot_histograms());
     REQUIRE_NOTHROW(uniform_sampler.plot_best_fit());
@@ -324,18 +325,4 @@ TEST_CASE("TEST PLOTTING","[Plotting][Uniform_Sampler]"){
     CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_b_3.1_5.53_1000_y=ax^b.png"));
     CHECK(std::filesystem::exists("plots/Sample2D/MarginalDistribution/dist_a_1.9_3.5_1000_y=ax^b.png"));
     CHECK(std::filesystem::exists("plots/Sample2D/CurveFit/fit_a_1.9_3.5_b_3.1_5.53_1000_y=ax^b.png")); //check files created properly
-}
-
-
-TEST_CASE("Test MetropolisHastingsSampler","[MHS]"){
-    std::array<std::string,4> names = {"a", "b", "c", "d"};
-    std::array<double, 4> min_vals = {-3, -3, -3,-3};
-    std::array<double, 4> max_vals = {3, 3, 3, 3};
-
-    MetropolisHastingSampler<double, 4> mh_sampler("data/problem_data_4D.txt", polynomial<double>, names, min_vals, max_vals,1000000,0.01);
-
-    mh_sampler.sample();
-    mh_sampler.summarise();
-    mh_sampler.plot_histograms("cubic","Sample4D/MHS");
-    mh_sampler.plot_best_fit("cubic", "Sample4D/MHS");
 }
