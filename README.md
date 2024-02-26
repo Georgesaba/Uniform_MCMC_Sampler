@@ -15,20 +15,20 @@ This application is built to fit data to a function with two parameters. The fun
 To run this application you need to use the command line flags -n and -f to specify the number of bins and flags respectively. These two flags are the only essential flags for this application. The -h flag can be used find brief run instructions and the defaults of the optional parameters. Below is an example:
 
 
-######################################################################################################## \n
-This program uses uniform sampling to fit data to the equation y = ax^b with default parameter ranges from 0 to 5. \n
-The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ). \n
+######################################################################################################## <br>
+This program uses uniform sampling to fit data to the equation y = ax^b with default parameter ranges from 0 to 5. <br>
+The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ). <br>
 
-Brief instructions can be found below. \n
-Usage: Sample2D -f <file_path> -n <number_of_bins> \n
-Options: \n
-  -h                Show this help message \n
-  -f  <path>        Path to the data file \n
-  -n  <bins>        Number of bins for sampling \n
-  -ar <upper,lower> Range for parameter a             (optional: default = 0,5) \n
-  -br <upper,lower> Range for parameter b             (optional: default = 0,5) \n
-  -p  <plot>        Plot condition (Y/N)              (optional: default = Y) \n
-  -g  <rigidity>    Strictness when Reading Data File (optional: default = false)  \n
+Brief instructions can be found below. <br>
+Usage: Sample2D -f <file_path> -n <number_of_bins> <br>
+Options: <br>
+  -h                Show this help message <br>
+  -f  <path>        Path to the data file <br>
+  -n  <bins>        Number of bins for sampling <br>
+  -ar <upper,lower> Range for parameter a             (optional: default = 0,5) <br>
+  -br <upper,lower> Range for parameter b             (optional: default = 0,5) <br>
+  -p  <plot>        Plot condition (Y/N)              (optional: default = Y) <br>
+  -g  <rigidity>    Strictness when Reading Data File (optional: default = false)  <br>
 ########################################################################################################
 
 -ar and -br are the flags for the range of parameters a and b respectively. There are also flags -p and -g which are the plot conditions and rigidity settings respectively.
@@ -57,17 +57,17 @@ The CurveFit files have the format `fit_{a}_{param a low}_{param a high}_{b}_{pa
 
 The MarginalDistribution files have the format `dist_{param name}_{param low}_{param high}_{number of bins}_y=ax^b.png`.
 
-######################################################################################################## \n
-Parameter a : \n
-Standard Deviation - 0.0386534 \n
-Mean - 2.50513 \n
-Parameter at Marginal Distribution Peak - 2.525 \n
+######################################################################################################## <br>
+Parameter a : <br>
+Standard Deviation - 0.0386534 <br>
+Mean - 2.50513 <br>
+Parameter at Marginal Distribution Peak - 2.525 <br>
 
-Parameter b : \n
-Standard Deviation - 0.114997 \n
-Mean - 4.13374 \n
-Parameter at Marginal Distribution Peak - 4.125 \n
-######################################################################################################## \n
+Parameter b : <br>
+Standard Deviation - 0.114997 <br>
+Mean - 4.13374 <br>
+Parameter at Marginal Distribution Peak - 4.125 <br>
+######################################################################################################## <br>
 
 ## Sample4D
 
@@ -79,23 +79,23 @@ To run this program three command line flags are absolutely essential: -f for th
 Using the -h flag or invalid command line arguments being passed will yield a help message such as the one shown below:
 
 ########################################################################################################
-This program uses uniform sampling to fit data to the equation y = ax^3 + bx^2 + cx + d with default parameter ranges from 0 to 5.\n
-The step size used for the Metropolis Hastings Sampler is 0.01. \n
-The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ). \n
+This program uses uniform sampling to fit data to the equation y = ax^3 + bx^2 + cx + d with default parameter ranges from 0 to 5.<br>
+The step size used for the Metropolis Hastings Sampler is 0.01. <br>
+The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ). <br>
 
-Brief instructions can be found below.\n
-Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number of samples>\n
-Options:\n
-  -h                       Show this help message \n
-  -f  <path>               Path to the data file \n
-  -n  <bins>               Number of bins for sampling \n
-  -s  <number_samples>     Number of Samples to take \n
-  -ar <upper,lower>        Range for parameter a                       (optional: default = -3,3) \n
-  -br <upper,lower>        Range for parameter b                       (optional: default = -3,3) \n
-  -cr <upper,lower>        Range for parameter c                       (optional: default = -3,3) \n
-  -dr <upper,lower>        Range for parameter d                       (optional: default = -3,3) \n
-  -p  <plot>               Plot condition (Y/N)                        (optional: default = Y) \n
-  -g  <rigidity>           Strictness when Reading Data File (Bool)    (optional: default = false) \n
+Brief instructions can be found below.<br>
+Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number of samples><br>
+Options:<br>
+  -h                       Show this help message <br>
+  -f  <path>               Path to the data file <br>
+  -n  <bins>               Number of bins for sampling <br>
+  -s  <number_samples>     Number of Samples to take <br>
+  -ar <upper,lower>        Range for parameter a                       (optional: default = -3,3) <br>
+  -br <upper,lower>        Range for parameter b                       (optional: default = -3,3) <br>
+  -cr <upper,lower>        Range for parameter c                       (optional: default = -3,3) <br>
+  -dr <upper,lower>        Range for parameter d                       (optional: default = -3,3) <br>
+  -p  <plot>               Plot condition (Y/N)                        (optional: default = Y) <br>
+  -g  <rigidity>           Strictness when Reading Data File (Bool)    (optional: default = false) <br>
 ########################################################################################################
 
 #### Examples:
@@ -131,23 +131,23 @@ The MHS/CurveFit files have the format `fit_a_{param a low}_{param a high}_b_{pa
 The MHS/MarginalDistribution files have the format `dist_{param name}_N_sample_{number of sample points}_step_size_0.01_{param low}_{param high}_{number of bins}_cubic.png`.
 
 ########################################################################################################
-Parameter a : \n
-Standard Deviation - 0.423076 \n
-Mean - -0.895843 \n
-Parameter at Marginal Distribution Peak - -0.75 \n
+Parameter a : <br>
+Standard Deviation - 0.423076 <br>
+Mean - -0.895843 <br>
+Parameter at Marginal Distribution Peak - -0.75 <br>
 
-Parameter b : \n
-Standard Deviation - 0.616433 \n
-Mean - 1.84729 \n
-Parameter at Marginal Distribution Peak - 1.71  \n
+Parameter b : <br>
+Standard Deviation - 0.616433 <br>
+Mean - 1.84729 <br>
+Parameter at Marginal Distribution Peak - 1.71  <br>
 
-Parameter c : \n
-Standard Deviation - 0.266852 \n
-Mean - 0.057443 \n
-Parameter at Marginal Distribution Peak - 0.15 \n
+Parameter c : <br>
+Standard Deviation - 0.266852 <br>
+Mean - 0.057443 <br>
+Parameter at Marginal Distribution Peak - 0.15 <br>
 
-Parameter d : \n
-Standard Deviation - 0.0419465 \n
-Mean - 0.995582 \n
-Parameter at Marginal Distribution Peak - 0.99 \n
+Parameter d : <br>
+Standard Deviation - 0.0419465 <br>
+Mean - 0.995582 <br>
+Parameter at Marginal Distribution Peak - 0.99 <br>
 ########################################################################################################
