@@ -49,4 +49,21 @@ Extra settings such as a range(2,3) for parameter a and range(4,5.5) for paramet
 ./build/bin/Sample2D -f data/problem_data_2D.txt -n 100 -ar 2,3 -br 4,5.5 -p false -g Y
 #################################################################################################################
 
+Below a possible output of the application can be seen. The mean values of the distributions indicate the most probable values for the parameters to take and the standard deviation gives the error of the respective parameter. Parameter at Marginal Distribution Peak tells us the bin that the peak of the distribution occupied. With plotting enabled plots of the data fitted to the function $f(x) = ax^b$ using the parameter means and individual marginal distributions of each parameter fitted to gaussian with the mean and standard deviation from the summary can be found. These are located in the plots/Sample2D folder. The subfolder CurveFit is for best fit lines and MarginalDistribution is for the distributions of each parameter. 
+
+The CurveFit files have the format fit_{a}_{param_a_low}_{param_a_high}_{b}_{param_b_low}_{param_b_high}_{number_bins}_y=ax^b.png.
+
+The MarginalDistribution files have the format dist_{param_name}_{param_low}_{param_high}_{number_bins}_y=ax^b.png.
+#################################################################################################################
+Parameter a : 
+Standard Deviation - 0.0386534
+Mean - 2.50513
+Parameter at Marginal Distribution Peak - 2.525
+
+Parameter b : 
+Standard Deviation - 0.114997
+Mean - 4.13374
+Parameter at Marginal Distribution Peak - 4.125
+#################################################################################################################
+
 ## Sample4D
