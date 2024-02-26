@@ -84,7 +84,7 @@ The step size used for the Metropolis Hastings Sampler is 0.01. <br>
 The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ). <br>
 
 Brief instructions can be found below.<br>
-Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number of samples><br>
+Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number_of_samples> <br>
 Options:<br>
   -h                       Show this help message <br>
   -f  <path>               Path to the data file <br>
