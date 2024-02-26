@@ -15,21 +15,21 @@ This application is built to fit data to a function with two parameters. The fun
 To run this application you need to use the command line flags -n and -f to specify the number of bins and flags respectively. These two flags are the only essential flags for this application. The -h flag can be used find brief run instructions and the defaults of the optional parameters. Below is an example:
 
 
-######################################################################################################################################################################################################
-This program uses uniform sampling to fit data to the equation y = ax^b with default parameter ranges from 0 to 5. 
-The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ).
+######################################################################################################## \n
+This program uses uniform sampling to fit data to the equation y = ax^b with default parameter ranges from 0 to 5. \n
+The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ). \n
 
-Brief instructions can be found below.
-Usage: Sample2D -f <file_path> -n <number_of_bins>
-Options:
-  -h                Show this help message
-  -f  <path>        Path to the data file
-  -n  <bins>        Number of bins for sampling
-  -ar <upper,lower> Range for parameter a             (optional: default = 0,5)
-  -br <upper,lower> Range for parameter b             (optional: default = 0,5)
-  -p  <plot>        Plot condition (Y/N)              (optional: default = Y)
-  -g  <rigidity>    Strictness when Reading Data File (optional: default = false)
-######################################################################################################################################################################################################
+Brief instructions can be found below. \n
+Usage: Sample2D -f <file_path> -n <number_of_bins> \n
+Options: \n
+  -h                Show this help message \n
+  -f  <path>        Path to the data file \n
+  -n  <bins>        Number of bins for sampling \n
+  -ar <upper,lower> Range for parameter a             (optional: default = 0,5) \n
+  -br <upper,lower> Range for parameter b             (optional: default = 0,5) \n
+  -p  <plot>        Plot condition (Y/N)              (optional: default = Y) \n
+  -g  <rigidity>    Strictness when Reading Data File (optional: default = false)  \n
+########################################################################################################
 
 -ar and -br are the flags for the range of parameters a and b respectively. There are also flags -p and -g which are the plot conditions and rigidity settings respectively.
 
@@ -41,16 +41,15 @@ In the same directory as this read me the below command will sample 100 bins acr
 
 It should be noted that the order does not matter when running the flags. Make sure there is a space between each flag and its value. Use of an invalid flag will terminate the program. 
 
-######################################################################################################################################################################################################
-./build/bin/Sample2D -f data/problem_data_2D.txt -n 100
-######################################################################################################################################################################################################
-
+########################################################################################################
+`./build/bin/Sample2D -f data/problem_data_2D.txt -n 100`
+########################################################################################################
 
 Extra settings such as a range(2,3) for parameter a and range(4,5.5) for parameter b, switching plotting off and enabling the rigidity setting can be triggered as below.
 
-######################################################################################################################################################################################################
-./build/bin/Sample2D -f data/problem_data_2D.txt -n 100 -ar 2,3 -br 4,5.5 -p N -g True
-######################################################################################################################################################################################################
+########################################################################################################
+`./build/bin/Sample2D -f data/problem_data_2D.txt -n 100 -ar 2,3 -br 4,5.5 -p N -g True`
+########################################################################################################
 
 Below a possible output of the application can be seen. The mean values of the distributions indicate the most probable values for the parameters to take and the standard deviation gives the error of the respective parameter. Parameter at Marginal Distribution Peak tells us the bin that the peak of the distribution occupied. With plotting enabled plots of the data fitted to the function $f(x) = ax^b$ using the parameter means and of the individual marginal distributions of each parameter fitted to gaussian with the mean and standard deviation from the summary can be found. These are located in the plots/Sample2D folder. The subfolder CurveFit is for best fit lines and MarginalDistribution is for the distributions of each parameter. 
 
@@ -58,17 +57,17 @@ The CurveFit files have the format `fit_{a}_{param a low}_{param a high}_{b}_{pa
 
 The MarginalDistribution files have the format `dist_{param name}_{param low}_{param high}_{number of bins}_y=ax^b.png`.
 
-######################################################################################################################################################################################################
-Parameter a : 
-Standard Deviation - 0.0386534
-Mean - 2.50513
-Parameter at Marginal Distribution Peak - 2.525
+######################################################################################################## \n
+Parameter a : \n
+Standard Deviation - 0.0386534 \n
+Mean - 2.50513 \n
+Parameter at Marginal Distribution Peak - 2.525 \n
 
-Parameter b : 
-Standard Deviation - 0.114997
-Mean - 4.13374
-Parameter at Marginal Distribution Peak - 4.125
-######################################################################################################################################################################################################
+Parameter b : \n
+Standard Deviation - 0.114997 \n
+Mean - 4.13374 \n
+Parameter at Marginal Distribution Peak - 4.125 \n
+######################################################################################################## \n
 
 ## Sample4D
 
@@ -79,46 +78,46 @@ To run this program three command line flags are absolutely essential: -f for th
 
 Using the -h flag or invalid command line arguments being passed will yield a help message such as the one shown below:
 
-######################################################################################################################################################################################################
-This program uses uniform sampling to fit data to the equation y = ax^3 + bx^2 + cx + d with default parameter ranges from 0 to 5.
-The step size used for the Metropolis Hastings Sampler is 0.01. 
-The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ).
+########################################################################################################
+This program uses uniform sampling to fit data to the equation y = ax^3 + bx^2 + cx + d with default parameter ranges from 0 to 5.\n
+The step size used for the Metropolis Hastings Sampler is 0.01. \n
+The data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ). \n
 
-Brief instructions can be found below.
-Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number of samples>
-Options:
-  -h                       Show this help message
-  -f  <path>               Path to the data file
-  -n  <bins>               Number of bins for sampling
-  -s  <number_samples>     Number of Samples to take
-  -ar <upper,lower>        Range for parameter a                       (optional: default = -3,3)
-  -br <upper,lower>        Range for parameter b                       (optional: default = -3,3)
-  -cr <upper,lower>        Range for parameter c                       (optional: default = -3,3)
-  -dr <upper,lower>        Range for parameter d                       (optional: default = -3,3)
-  -p  <plot>               Plot condition (Y/N)                        (optional: default = Y)
-  -g  <rigidity>           Strictness when Reading Data File (Bool)    (optional: default = false)
-######################################################################################################################################################################################################
+Brief instructions can be found below.\n
+Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number of samples>\n
+Options:\n
+  -h                       Show this help message \n
+  -f  <path>               Path to the data file \n
+  -n  <bins>               Number of bins for sampling \n
+  -s  <number_samples>     Number of Samples to take \n
+  -ar <upper,lower>        Range for parameter a                       (optional: default = -3,3) \n
+  -br <upper,lower>        Range for parameter b                       (optional: default = -3,3) \n
+  -cr <upper,lower>        Range for parameter c                       (optional: default = -3,3) \n
+  -dr <upper,lower>        Range for parameter d                       (optional: default = -3,3) \n
+  -p  <plot>               Plot condition (Y/N)                        (optional: default = Y) \n
+  -g  <rigidity>           Strictness when Reading Data File (Bool)    (optional: default = false) \n
+########################################################################################################
 
 #### Examples:
 
 The below command will use the MCMC Metropolis Hastings Sampling method to sample 200,000 points with each parameter range discretised into 100 bins. As a uniform approach would need to sample too many points so would be incredibly inefficient the MCMC method is used. The parameter space will automatically have range(-3,3) for each parameter if not specified otherwise. It should be noted that the order does not matter when running the flags. Make sure there is a space between each flag and its value. Use of an invalid flag will terminate the program. This should print "Metropolis Hastings Sampler Initiated" showing which sampler is being used.
 
-######################################################################################################################################################################################################
-./build/bin/Sample4D -f data/problem_data_4D.txt -n 100 -s 200000
-######################################################################################################################################################################################################
+########################################################################################################
+`./build/bin/Sample4D -f data/problem_data_4D.txt -n 100 -s 200000`
+########################################################################################################
 
 The below command will instead sample using the Uniform Sampler as $20^4$ is less than 200,000. It should print "Uniform Sampler Initiated".
 
-######################################################################################################################################################################################################
-./build/bin/Sample4D -f data/problem_data_4D.txt -n 20 -s 200000
-######################################################################################################################################################################################################
+########################################################################################################
+`./build/bin/Sample4D -f data/problem_data_4D.txt -n 20 -s 200000`
+########################################################################################################
 
 
 Extra settings such as setting ranges of (-1.2,0.5); (1.5,2.1); (-0.3,0.3); (0.8, 1.2) for parameters a, b, c and d respectively or turning plotting off and enabling rigidity for reading data can be implemented as shown below. Functionality to change the step-size is not included however is possible with the libraries this application uses.
 
-######################################################################################################################################################################################################
-./build/bin/Sample4D -f data/problem_data_4D.txt -n 100 -s 200000 -ar -1.2,0.5 -br 1.5,2.1 -cr -0.3,0.3 -dr 0.8,1.2 -p N -g true
-######################################################################################################################################################################################################
+########################################################################################################
+`./build/bin/Sample4D -f data/problem_data_4D.txt -n 100 -s 200000 -ar -1.2,0.5 -br 1.5,2.1 -cr -0.3,0.3 -dr 0.8,1.2 -p N -g true`
+########################################################################################################
 
 
 Below a possible output of the application can be seen. The mean values of the distributions indicate the most probable values for the parameters to take and the standard deviation gives the error of the respective parameter. Parameter at Marginal Distribution Peak tells us the bin that the peak of the distribution occupied. With plotting enabled plots of the data fitted to the function $f(x) = ax^3 + bx^2 + cx + d$ using the parameter means and of the individual marginal distributions of each parameter fitted to gaussian with the mean and standard deviation from the summary can be found. These are located in the plots/Sample4D folder. The subfolder MHS is for results obtained using the MCMC MHS sampler and the subfolder Uniform is for results obtained using uniform sampling. The subfolder CurveFit is for best fit lines and MarginalDistribution is for the distributions of each parameter.
@@ -131,25 +130,24 @@ The MHS/CurveFit files have the format `fit_a_{param a low}_{param a high}_b_{pa
 
 The MHS/MarginalDistribution files have the format `dist_{param name}_N_sample_{number of sample points}_step_size_0.01_{param low}_{param high}_{number of bins}_cubic.png`.
 
+########################################################################################################
+Parameter a : \n
+Standard Deviation - 0.423076 \n
+Mean - -0.895843 \n
+Parameter at Marginal Distribution Peak - -0.75 \n
 
-######################################################################################################################################################################################################
-Parameter a : 
-Standard Deviation - 0.423076
-Mean - -0.895843
-Parameter at Marginal Distribution Peak - -0.75
+Parameter b : \n
+Standard Deviation - 0.616433 \n
+Mean - 1.84729 \n
+Parameter at Marginal Distribution Peak - 1.71  \n
 
-Parameter b : 
-Standard Deviation - 0.616433
-Mean - 1.84729
-Parameter at Marginal Distribution Peak - 1.71
+Parameter c : \n
+Standard Deviation - 0.266852 \n
+Mean - 0.057443 \n
+Parameter at Marginal Distribution Peak - 0.15 \n
 
-Parameter c : 
-Standard Deviation - 0.266852
-Mean - 0.057443
-Parameter at Marginal Distribution Peak - 0.15
-
-Parameter d : 
-Standard Deviation - 0.0419465
-Mean - 0.995582
-Parameter at Marginal Distribution Peak - 0.99
-######################################################################################################################################################################################################
+Parameter d : \n
+Standard Deviation - 0.0419465 \n
+Mean - 0.995582 \n
+Parameter at Marginal Distribution Peak - 0.99 \n
+########################################################################################################
