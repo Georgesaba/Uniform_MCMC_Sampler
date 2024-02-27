@@ -3,20 +3,22 @@
 #include "UniformSampler.hpp"
 #include "ModelFunctions.hpp"
 #include <memory>
-
+/**
+ * @brief: This function prints out a help message that helps the user use the Sample2D application.
+*/
 void HelpMessage(){
     std::cout << "This program uses uniform sampling to fit data to the equation y = ax^b with default parameter ranges from 0 to 5. \nThe data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ).\n\nBrief instructions can be found below." << std::endl;
     std::cout << "Usage: Sample2D -f <file_path> -n <number_of_bins>\n"
               << "Options:\n"
               << "  -h                Show this help message\n"
-              << "  -f <path>         Path to the data file\n"
-              << "  -n <bins>         Number of bins for sampling\n"
+              << "  -f  <path>        Path to the data file\n"
+              << "  -n  <bins>        Number of bins for sampling\n"
               << "  -ar <upper,lower> Range for parameter a             (optional: default = 0,5)\n"
               << "  -br <upper,lower> Range for parameter b             (optional: default = 0,5)\n"
               << "  -p  <plot>        Plot condition (Y/N)              (optional: default = Y)\n"
-              << "  -g <rigidity>     Strictness when Reading Data File (optional: default = false)" << std::endl;
+              << "  -g  <rigidity>    Strictness when Reading Data File (optional: default = false)" << std::endl;
 }
-
+// finds index of comma in string and then uses it as delimiter to split into two substrings. Converts string to double after.
 std::array<double,2> split(std::string ranges){
     uint idx_comma = 0;
     for (uint i = 0; i < ranges.size(); i++){
@@ -48,7 +50,7 @@ int main(int argc, char** argv)
     bool rigidity = false;
     bool filepath_set = false;
     bool num_bins_set = false;
-    bool a_range_set = false;
+    bool a_range_set = false; // track if values have been set already. std::optional could also have been used here however this approach is simpler as some conditions have default values.
     bool b_range_set = false;
     bool rigidity_set = false;
     bool plot_condition = true;
@@ -56,10 +58,7 @@ int main(int argc, char** argv)
     std::array<double,2> a_range;
     std::array<double, 2> b_range;
 
-    // std::cout << std::string(argv[0]) << "," << std::string(argv[1]) << std::endl;
-    // std::cout << argc << std::endl;
-
-    for (int i = 1; i < argc; i+=2){
+    for (int i = 1; i < argc; i+=2){ // check for flags
         std::string arg(argv[i]);
         if (arg == "-h"){
             HelpMessage();
@@ -67,7 +66,7 @@ int main(int argc, char** argv)
         }
         else if (arg == "-f") {
             if (filepath_set){
-                std::cerr << "Error - Cannot set filepath twice!" << std::endl;
+                std::cerr << "Error - Cannot set filepath twice!" << std::endl; // check for clashes caused by setting the same value to different conditions. 
                 HelpMessage();
                 return 1;
             }
@@ -105,8 +104,8 @@ int main(int argc, char** argv)
                 HelpMessage();
                 return 1;
             }
-        }
-        else if (arg == "-ar"){
+        } // error handling 
+        else if (arg == "-ar"){ 
             if (a_range_set){
                 std::cerr << "Error - the range of parameter a has already been set!" << std::endl;
                 HelpMessage();
@@ -114,14 +113,13 @@ int main(int argc, char** argv)
             }
             std::string arg1(argv[i+1]);
             try{
-                split(arg1.c_str());   // test operation for parameter a. Since try is separate scope to avoid usage of pointers to heap operation is being run twice.
+                a_range = split(arg1.c_str());   // test operation for parameter a.
             }
             catch(const std::invalid_argument&){
                 std::cerr << "Error - the range of parameter a has had incorrect inputs!" << std::endl;
                 HelpMessage();
                 return 1;
             }
-            a_range = split(arg1.c_str());
             
             a_range_set = true;
         }
@@ -133,14 +131,13 @@ int main(int argc, char** argv)
             }
             std::string arg1(argv[i+1]);
             try{
-                split(arg1.c_str());
+                b_range = split(arg1.c_str());
             }
             catch(const std::invalid_argument&){
                 std::cerr << "Error - the range of parameter b has had incorrect inputs!" << std::endl;
                 HelpMessage();
                 return 1;
             }
-            b_range = split(arg1.c_str());
             b_range_set = true;
         }
         else if (arg == "-p"){
@@ -164,7 +161,7 @@ int main(int argc, char** argv)
                 return 1;
             }
         }
-        else{
+        else{ // extra error handling
             std::cerr << "Invalid Flag Detected: " << arg << std::endl;
             return 1;
         }
@@ -181,7 +178,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    std::array<std::string,2> names = {"a", "b"};
+    std::array<std::string,2> names = {"a", "b"}; // assign defaults or user input values
     std::array<double, 2> min_vals;
     std::array<double, 2> max_vals;
     if (a_range_set){
@@ -204,7 +201,7 @@ int main(int argc, char** argv)
     std::unique_ptr<UniformSampler<double, 2>> uniform_sampler_ptr;
 
     try{
-        uniform_sampler_ptr = std::make_unique<UniformSampler<double, 2>>(filepath,param_2_model_func<double>,names, min_vals, max_vals, num_bins,rigidity);
+        uniform_sampler_ptr = std::make_unique<UniformSampler<double, 2>>(filepath,param_2_model_func<double>,names, min_vals, max_vals, num_bins,rigidity); // declared before so it exists outside of try scope. Use smart pointers for delayed construction of object
     }
     catch(const std::exception &e){
         std::cerr << e.what() << std::endl;

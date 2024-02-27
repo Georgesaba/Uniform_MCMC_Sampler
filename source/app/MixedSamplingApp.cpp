@@ -5,6 +5,22 @@
 #include "ModelFunctions.hpp"
 #include <memory>
 
+
+/**
+ * @brief Factory method function for producing a unique pointer to either a Metropolis Hastings Sampler or Uniform Sampler based on if the total parameter space is larger than or equal to the number of sample points specified.
+ * @param filepath: Filepath to data that the sampling technique will use to fit the parameters of the model.
+ * @param func: Function that the data is being fit to. For this application it is y = ax^3 + bx^2 + cx + d. This function must have two arguments: x input value and array of all parameters.
+ * @param names: Array of the names of all the parameters.
+ * @param min_values: Array of the minimum values of all the parameters.
+ * @param max_values: Array of the maximum values of all the parameters.
+ * @param num_bins: Number of bins used to discretise parameter space in each dimension.
+ * @param step_size: Standard deviation of the mean centered normal distribution that is used to increment the parameter vector in the unit hypercube space.
+ * @param num_sample_points: Max number of points used to sample the distribution.
+ * @param rigidity: Rigidity setting for Observations object that loads data. true means that an exception is throw if there is an error with the data. false means that an error message is printed and the erroneous row is skipped but the file still is read.
+ * @tparam REAL: type representing real numbers; usually float or double.
+ * @tparam num_params: number of parameters that are being used to fit the model.
+ * @return Unique pointer to class that is derived from the base abstract Sampler class. Either Uniform Sampler or MCMC sampler.
+*/
 template<typename REAL, std::size_t num_params>
 std::unique_ptr<Sampler<REAL, num_params>> SamplerGen( 
     const std::string &filepath,
@@ -28,23 +44,23 @@ std::unique_ptr<Sampler<REAL, num_params>> SamplerGen(
     }
 
 
-
-
-
+/**
+ * @brief: This function prints a help message for the Sampl4D application.
+*/
 void HelpMessage(){
     std::cout << "This program uses uniform sampling to fit data to the equation y = ax^3 + bx^2 + cx + d with default parameter ranges from 0 to 5.\nThe step size used for the Metropolis Hastings Sampler is 0.01. \nThe data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ).\n\nBrief instructions can be found below." << std::endl;
     std::cout << "Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number of samples>\n"
               << "Options:\n"
               << "  -h                       Show this help message\n"
-              << "  -f <path>                Path to the data file\n"
-              << "  -n <bins>                Number of bins for sampling\n"
+              << "  -f  <path>               Path to the data file\n"
+              << "  -n  <bins>               Number of bins for sampling\n"
               << "  -s  <number_samples>     Number of Samples to take\n"
               << "  -ar <upper,lower>        Range for parameter a                       (optional: default = -3,3)\n"
               << "  -br <upper,lower>        Range for parameter b                       (optional: default = -3,3)\n"
               << "  -cr <upper,lower>        Range for parameter c                       (optional: default = -3,3)\n"
               << "  -dr <upper,lower>        Range for parameter d                       (optional: default = -3,3)\n"
               << "  -p  <plot>               Plot condition (Y/N)                        (optional: default = Y)\n"
-              << "  -g <rigidity>            Strictness when Reading Data File (Bool)    (optional: default = false)" << std::endl;
+              << "  -g  <rigidity>           Strictness when Reading Data File (Bool)    (optional: default = false)" << std::endl;
 }
 
 std::array<double,2> split(std::string ranges){
@@ -73,6 +89,7 @@ std::array<double,2> split(std::string ranges){
 
 int main(int argc, char** argv)
 {
+    // initialising all conditions and parameters for sampling class
     std::string filepath;
     uint num_bins = 0;
     uint num_samples = 0;
@@ -92,15 +109,15 @@ int main(int argc, char** argv)
     std::array<double, 2> c_range;
     std::array<double, 2> d_range;
 
-    for (int i = 1; i < argc; i+=2){
+    for (int i = 1; i < argc; i+=2){ // pass through every item in the stream. Incrementing by 2 as flag is followed by argument.
         std::string arg(argv[i]);
-        if (arg == "-h"){
+        if (arg == "-h"){ // check for help flag
             HelpMessage();
             return 0;
         }
         else if (arg == "-f") {
             if (filepath_set){
-                std::cerr << "Error - Cannot set filepath twice!" << std::endl;
+                std::cerr << "Error - Cannot set filepath twice!" << std::endl; // fix clashed of two different values of the same parameter being set.
                 HelpMessage();
                 return 1;
             }
@@ -157,14 +174,13 @@ int main(int argc, char** argv)
             }
             std::string arg1(argv[i+1]);
             try{
-                split(arg1.c_str());   // test operation for parameter a. Since try is separate scope to avoid usage of pointers to heap operation is being run twice.
+                a_range = split(arg1.c_str());   // test operation for parameter a. 
             }
             catch(const std::invalid_argument&){
                 std::cerr << "Error - the range of parameter a has had incorrect inputs!" << std::endl;
                 HelpMessage();
                 return 1;
             }
-            a_range = split(arg1.c_str());
             a_range_set = true;
         }
         else if (arg == "-br"){
@@ -175,14 +191,13 @@ int main(int argc, char** argv)
             }
             std::string arg1(argv[i+1]);
             try{
-                split(arg1.c_str());   // test operation for parameter a. Since try is separate scope to avoid usage of pointers to heap operation is being run twice.
+                b_range = split(arg1.c_str());   // test operation for parameter b. 
             }
             catch(const std::invalid_argument&){
                 std::cerr << "Error - the range of parameter b has had incorrect inputs!" << std::endl;
                 HelpMessage();
                 return 1;
             }
-            b_range = split(arg1.c_str());
             b_range_set = true;
         }
         else if (arg == "-cr"){
@@ -193,14 +208,13 @@ int main(int argc, char** argv)
             }
             std::string arg1(argv[i+1]);
             try{
-                split(arg1.c_str());   // test operation for parameter a. Since try is separate scope to avoid usage of pointers to heap operation is being run twice.
+                c_range = split(arg1.c_str());   // test operation for parameter c. 
             }
             catch(const std::invalid_argument&){
                 std::cerr << "Error - the range of parameter c has had incorrect inputs!" << std::endl;
                 HelpMessage();
                 return 1;
             }
-            c_range = split(arg1.c_str());
             c_range_set = true;
         }
         else if (arg == "-dr"){
@@ -211,14 +225,13 @@ int main(int argc, char** argv)
             }
             std::string arg1(argv[i+1]);
             try{
-                split(arg1.c_str());   // test operation for parameter a. Since try is separate scope to avoid usage of pointers to heap operation is being run twice.
+                d_range = split(arg1.c_str());   // test operation for parameter d. 
             }
             catch(const std::invalid_argument&){
                 std::cerr << "Error - the range of parameter d has had incorrect inputs!" << std::endl;
                 HelpMessage();
                 return 1;
             }
-            d_range = split(arg1.c_str());
             d_range_set = true;
         }
         else if (arg == "-p"){
@@ -243,10 +256,10 @@ int main(int argc, char** argv)
             }
         }
         else{
-            std::cerr << "Invalid Flag Detected: " << arg << std::endl;
+            std::cerr << "Invalid Flag Detected: " << arg << std::endl; // outlier flags.
             return 1;
         }
-    }
+    }// checking for invalid flags or insufficient flags
     if (!(num_bins_set && filepath_set && number_samples_set)){
         std::cerr << "Please enter the number of bins, filepath and the number of parameters to sample!" << std::endl;
         HelpMessage();
@@ -258,7 +271,7 @@ int main(int argc, char** argv)
         HelpMessage();
         return 1;
     }
-
+    // choosing between default values and user input values.
     std::array<std::string, 4> names = {"a", "b", "c", "d"};
     std::array<double, 4> min_vals;
     std::array<double, 4> max_vals;
@@ -298,7 +311,7 @@ int main(int argc, char** argv)
     std::unique_ptr<Sampler<double, 4>> sampler_ptr;
 
     try{
-        sampler_ptr = SamplerGen<double, 4>(filepath,polynomial<double>,names, min_vals, max_vals, num_bins, 0.01, num_samples,rigidity);
+        sampler_ptr = SamplerGen<double, 4>(filepath,polynomial<double>,names, min_vals, max_vals, num_bins, 0.01, num_samples,rigidity); // use of factory method which returns value which is assigned to unique pointer for Sampler base class. Example of polymorphism.
     }
     catch(const std::exception &e){
         std::cerr << e.what() << std::endl;
@@ -309,7 +322,7 @@ int main(int argc, char** argv)
     sampler_ptr->sample();
     sampler_ptr->summarise();
 
-    std::string sample_mode;
+    std::string sample_mode; // so files sent to correct folder based off sampling technique.
     if (num_samples >= std::pow(num_bins, 4)){
         sample_mode = "Uniform";
     }

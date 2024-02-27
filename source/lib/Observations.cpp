@@ -95,7 +95,6 @@ void Observations<REAL>::loadData(const std::string& filename, const bool rigidi
         }
     }
     filestream.close();
-    assert((sigmas.size() == outputs.size()) && (sigmas.size() == inputs.size()));
     num_points = sigmas.size();
 }
 

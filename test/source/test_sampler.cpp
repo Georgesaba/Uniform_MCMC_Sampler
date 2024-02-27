@@ -200,7 +200,7 @@ TEST_CASE("Test file reader (double) with negative sigma value in second row - r
     REQUIRE_THROWS_WITH(obs.loadData("test/test_data/testing_data4.txt",true),"Error - Sigma value possess invalid negative value in line 2 : 4.906167379139929619e-01 7.453083689569964809e-01 -2.000000000000000000e+00");
 }
 
-TEST_CASE("Test Sampler constructor", "[Sampler]"){
+TEST_CASE("Test Sampler Constructor", "[Sampler]"){
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0.4,1.9};
     std::array<double, 2> max_vals = {3.0, 9.0};
@@ -214,7 +214,7 @@ TEST_CASE("Test Sampler constructor", "[Sampler]"){
     CHECK(uniform_sampler.get_params_info()[1].min == min_vals[1]);
     CHECK(uniform_sampler.get_params_info()[1].name == names[1]);
 
-    //REQUIRE_THROWS_AS(UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,-1),std::domain_error);
+    REQUIRE_THROWS(UniformSampler<double, 2>("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,-1));
 }
 
 // TODO: Create test cases for constructor, rigidity = true for loadData and check for additional aspects of the sampling behaviour we want to check for. Add tests for param ranges of different sizes.

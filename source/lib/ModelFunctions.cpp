@@ -45,4 +45,4 @@ template float param_1_model_func<float>(float, std::array<float, 1>&);
 template float param_test_model_func<float>(float, std::array<float, 2>&);
 template float param_3_test_model_func<float>(float, std::array<float, 3>&);
 template float gaussian_func<float>(float, float, float);
-template float polynomial<float>(float, std::array<float,4>&);
+template float polynomial<float>(float, std::array<float,4>&); // manual instantiation

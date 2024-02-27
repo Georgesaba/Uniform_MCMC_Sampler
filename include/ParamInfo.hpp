@@ -12,6 +12,7 @@ class ParamInfo
 {
 public:
     ParamInfo() = default;
+
     ParamInfo(REAL min, REAL max, std::string name) : min(min), max(max), name(name)
     {
         width = max - min;
@@ -27,7 +28,7 @@ public:
     REAL width = max - min;
     std::string name;
 
-    REAL marginal_distribution_peak;
+    REAL marginal_distribution_peak; // for storing summary statistics.
     REAL mean_parameter;
     REAL standard_deviation;    
 };
