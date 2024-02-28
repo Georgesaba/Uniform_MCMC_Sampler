@@ -1,7 +1,6 @@
 #pragma once
 #include "Sampler.hpp"
 #include <random>
-#include <cassert>
 
 /**
  * @brief Derived class template from base abstract class template that uses the Monte Carlo Markov Chain sampling method using the Metropolis Hastings algorithm. 
