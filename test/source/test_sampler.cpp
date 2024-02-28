@@ -200,7 +200,7 @@ TEST_CASE("Test file reader (double) with negative sigma value in second row - r
     REQUIRE_THROWS_WITH(obs.loadData("test/test_data/testing_data4.txt",true),"Error - Sigma value possess invalid negative value in line 2 : 4.906167379139929619e-01 7.453083689569964809e-01 -2.000000000000000000e+00");
 }
 
-TEST_CASE("Test Sampler Constructor", "[Sampler]"){
+TEST_CASE("Test Sampler Constructor Assigns number of bins and param information properly", "[Sampler]"){
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0.4,1.9};
     std::array<double, 2> max_vals = {3.0, 9.0};
@@ -213,13 +213,25 @@ TEST_CASE("Test Sampler Constructor", "[Sampler]"){
     CHECK(uniform_sampler.get_params_info()[1].max == max_vals[1]);
     CHECK(uniform_sampler.get_params_info()[1].min == min_vals[1]);
     CHECK(uniform_sampler.get_params_info()[1].name == names[1]);
-
-    REQUIRE_THROWS(UniformSampler<double, 2>("data/problem_data_2D.txt",param_2_model_func<double>,names, min_vals, max_vals,-1));
 }
 
-// TODO: Create test cases for constructor, rigidity = true for loadData and check for additional aspects of the sampling behaviour we want to check for. Add tests for param ranges of different sizes.
-TEST_CASE("Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform_Sampler]"){
-    // instantiate Uniform Sampler with double data type and two parameters.
+TEST_CASE("Test Sampler Constructor Error Handling","[Sampler]"){
+    std::array<std::string, 2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {0.4,1.9};
+    std::array<double, 2> max_vals = {3.0, 9.0};
+    REQUIRE_THROWS(UniformSampler<double, 2>("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals,-1));
+    REQUIRE_THROWS(UniformSampler<double, 2>("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals, 0));
+    
+    auto originalCerrBuff = std::cerr.rdbuf();
+    std::ostringstream capturedOutput;
+    std::cerr.rdbuf(capturedOutput.rdbuf());
+    UniformSampler<double, 2> uniform_sampler("data/problem_data_2D.txt", param_2_model_func<double>, names, min_vals, max_vals, 1000000);
+    std::cerr.rdbuf(originalCerrBuff);
+    std::string expected_output = "Warning - Total parameter space exceeds 1,000,000,000. Uniform Sampling techniques are inefficient at this scale.\n";
+    CHECK(capturedOutput.str() == expected_output);
+}
+
+TEST_CASE("Test uniform sampling 2 dimensions with range (0,1)","[Uniform_Sampler]"){
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
     std::array<double, 2> max_vals = {1, 1};
@@ -235,7 +247,9 @@ TEST_CASE("Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform_S
     std::cout.rdbuf(originalCoutBuff);
     std::string expected_output = "(0.25, 0.25): -2767.73\n(0.25, 0.75): -2776.7\n(0.75, 0.25): -2074.02\n(0.75, 0.75): -1586.32\n";
     CHECK(capturedOutput.str() == expected_output);
+}
 
+TEST_CASE("Test uniform sampling 1 dimension with range (0,1)","[Uniform_Sampler]"){
     // instantiate Uniform Sampler with double data type and 1 parameter.
     std::array<std::string, 1> names2 = {"a"};
     std::array<double, 1> min_vals2 = {0};
@@ -254,7 +268,7 @@ TEST_CASE("Test uniform sampling 1 to 2 dimensions with range (0,1)","[Uniform_S
     CHECK(capturedOutput2.str() == expected_output2);
 }
 
-TEST_CASE("Test Sample Function for Uniform Sampler from 2 to 3 dimensions", "[Uniform_Sampler]"){
+TEST_CASE("Test Sample Function for Uniform Sampler in 2 dimensions", "[Uniform_Sampler]"){
     //2 dimension param space, 3 bins, 0-1 range
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
@@ -264,7 +278,9 @@ TEST_CASE("Test Sample Function for Uniform Sampler from 2 to 3 dimensions", "[U
     std::map<std::array<double, 2>,double> likelihood_map = uniform_sampler.get_param_likelihood();
     std::vector<std::array<double, 2>> validation_points = {{1.0/6.0,1.0/6.0},{1.0/6.0,1.0/2.0},{1.0/6.0,5.0/6.0},{1.0/2.0,1.0/6.0},{1.0/2.0,1.0/2.0},{1.0/2.0,5.0/6.0},{5.0/6.0,1.0/6.0},{5.0/6.0,1.0/2.0},{5.0/6.0,5.0/6.0}};
     check_sampled_points<double,2>(likelihood_map, validation_points);
+}
 
+TEST_CASE("Test Sample Function for Uniform Sampler in 3 dimensions", "[Uniform_Sampler]"){
     //3 dimension, 2 bins, 0-1 range
     std::array<std::string, 3> names2 = {"a","b","c"};
     std::array<double, 3> min_vals2 = {0,0,0};
@@ -275,18 +291,28 @@ TEST_CASE("Test Sample Function for Uniform Sampler from 2 to 3 dimensions", "[U
     std::vector<std::array<double,3>> validation_points2 = {{0.25,0.25,0.25},{0.25,0.25,0.75},{0.25,0.75,0.25},{0.25,0.75,0.75},{0.75,0.25,0.25},{0.75,0.25,0.75},{0.75,0.75,0.25},{0.75,0.75,0.75}};
     
     check_sampled_points<double,3>(likelihood_map2,validation_points2);
+}
+
+TEST_CASE("Test Sample Function for Uniform Sampler in 2 dimensions with different ranges","[Uniform_Sampler]"){
+    std::array<std::string, 2> names = {"a", "b"};
+    std::array<double, 2> min_vals = {0, 1};
+    std::array<double, 2> max_vals = {5, 2};
+    UniformSampler<double, 2> uniform_sampler("test/test_data/testing_data_2D.txt", param_test_model_func<double>, names, min_vals, max_vals, 4);
+    uniform_sampler.sample();
+    std::map<std::array<double, 2>,double> likelihood_map = uniform_sampler.get_param_likelihood();
+    std::vector<std::array<double,2>> validation_points = {{0.625,1.125},{0.625,1.375},{0.625,1.625},{0.625,1.875},{1.875,1.125},{1.875, 1.375},{1.875,1.625},{1.875,1.875}, {3.125,1.125},{3.125,1.375},{3.125,1.625},{3.125,1.875},{4.375, 1.125},{4.375,1.375},{4.375,1.625},{4.375,1.875}};
     
+    check_sampled_points<double,2>(likelihood_map,validation_points);
 }
 
 TEST_CASE("Test likelihood function","[Likelihood_Calc]"){
-    test_data test_likelihood;
     std::array<std::string, 2> names = {"a", "b"};
     std::array<double, 2> min_vals = {0,0};
     std::array<double, 2> max_vals = {1, 1};
     UniformSampler<double, 2> uniform_sampler("test/test_data/testing_data_2D.txt", param_test_model_func<double>, names, min_vals, max_vals, 3);  
     
-    for (uint i = 0; i < test_likelihood.sample_likelihoods.size(); i++){
-        CHECK_THAT(std::exp(uniform_sampler.log_likelihood(test_likelihood.sample_points_2d[i])),WithinRel(test_likelihood.sample_likelihoods[i],0.000001)); // e is raised to the power of the log-likelihood to get the likelihood.
+    for (uint i = 0; i < test_data::sample_likelihoods.size(); i++){
+        CHECK_THAT(std::exp(uniform_sampler.log_likelihood(test_data::sample_points_2d[i])),WithinRel(test_data::sample_likelihoods[i],0.000001)); // e is raised to the power of the log-likelihood to get the likelihood.
     }
 }
 
@@ -312,7 +338,7 @@ TEST_CASE("Sampling Statistics","[Uniform_Sampler][Summarise]"){
     REQUIRE_NOTHROW(uniform_sampler.plot_best_fit());
 }
 
-TEST_CASE("TEST PLOTTING","[Plotting][Uniform_Sampler]"){
+TEST_CASE("TEST PLOTTING","[Plotting]"){
     std::array<std::string,2> names = {"a", "b"};
     std::array<double, 2> min_vals = {1.9, 3.1};
     std::array<double, 2> max_vals = {3.5, 5.53};

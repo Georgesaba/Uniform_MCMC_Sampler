@@ -94,7 +94,7 @@ class MetropolisHastingSampler : public Sampler<REAL, num_params>{
                 this -> parameter_likelihood[new_params] = lg_likelihood;
                 
             }
-            else{           
+            else{           // second acceptance criterion
                 if ((lg_likelihood - this -> parameter_likelihood[params]) > std::log(initial_dist(generator))){
                     params = new_params;
                     unit_hypercube = new_unit_hypercube;
@@ -102,7 +102,7 @@ class MetropolisHastingSampler : public Sampler<REAL, num_params>{
                     
                 }
                 else{
-                    new_params = params;
+                    new_params = params; // reject
                     new_unit_hypercube = unit_hypercube;
                 }
             }
