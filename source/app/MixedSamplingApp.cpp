@@ -48,7 +48,7 @@ std::unique_ptr<Sampler<REAL, num_params>> SamplerGen(
  * @brief: This function prints a help message for the Sampl4D application.
 */
 void HelpMessage(){
-    std::cout << "This program uses uniform sampling to fit data to the equation y = ax^3 + bx^2 + cx + d with default parameter ranges from 0 to 5.\nThe step size used for the Metropolis Hastings Sampler is 0.01. \nThe data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ).\n\nBrief instructions can be found below." << std::endl;
+    std::cout << "This program uses a combination of uniform and MCMC sampling to fit data to the equation y = ax^3 + bx^2 + cx + d with default parameter ranges from 0 to 5.\nThe step size used for the Metropolis Hastings Sampler is 0.01. \nThe data should come in the format of a txt file with columns inputs (x), outputs (y) or error (σ).\n\nBrief instructions can be found below." << std::endl;
     std::cout << "Usage: Sample4D -f <file_path> -n <number_of_bins> -s <number of samples>\n"
               << "Options:\n"
               << "  -h                       Show this help message\n"
